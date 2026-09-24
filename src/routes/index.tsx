@@ -54,7 +54,7 @@ function Navigation() {
       </Button>
       {open && (
         <nav className="mobile-menu" aria-label="Mobile navigation">
-          {[["How it works", "how-it-works"], ["Why VicTy", "why-victy"], ["About", "about"]].map(([label, id]) => (
+          {([["How it works", "how-it-works"], ["Why VicTy", "why-victy"], ["About", "about"]] as const).map(([label, id]) => (
             <button key={id} onClick={() => navigate(id)}>{label}<ChevronRight className="size-4" /></button>
           ))}
           <Button onClick={() => navigate("waitlist")}>Join the waitlist <ArrowRight className="size-4" /></Button>

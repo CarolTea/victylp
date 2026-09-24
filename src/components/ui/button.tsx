@@ -1,6 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import type { ButtonHTMLAttributes } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -8,8 +8,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        default:
+          "border-primary bg-primary text-primary-foreground shadow-glow hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-glow-strong",
         primary:
           "border-primary bg-primary text-primary-foreground shadow-glow hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-glow-strong",
+        destructive:
+          "border-destructive bg-destructive text-destructive-foreground hover:brightness-110",
+        outline:
+          "border-border bg-surface/70 text-foreground backdrop-blur-xl hover:-translate-y-0.5 hover:border-primary/50 hover:bg-surface-strong",
         secondary:
           "border-border bg-surface/70 text-foreground backdrop-blur-xl hover:-translate-y-0.5 hover:border-primary/50 hover:bg-surface-strong",
         ghost:
@@ -24,16 +30,19 @@ const buttonVariants = cva(
         icon: "size-11 min-h-11 p-0",
       },
     },
-    defaultVariants: { variant: "primary", size: "default" },
+    defaultVariants: { variant: "default", size: "default" },
   },
 );
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonVariants> & { asChild?: boolean };
 
-function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, variant, size, asChild = false, ...props },
+  ref,
+) {
   const Comp = asChild ? Slot : "button";
-  return <Comp className={cn(buttonVariants({ variant, size }), className)} {...props} />;
-}
+  return <Comp ref={ref} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+});
 
 export { Button, buttonVariants };
