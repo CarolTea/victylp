@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790293069411,
+      "tag": "0000_create_early_access_signups",
+      "breakpoints": true
+    }
+  ]
 }
