@@ -89,7 +89,8 @@ button { cursor: pointer; }
 .signal-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 14px var(--signal); }
 .hero-title { margin: 0; font-size: clamp(3.45rem, 6.8vw, 6.6rem); font-weight: 500; line-height: .96; letter-spacing: 0; }
 .hero-title span, .gradient-text { background: linear-gradient(100deg, var(--primary), var(--violet) 56%, #b9a0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hero-copy, .section-copy { max-width: 590px; margin-top: 28px; color: var(--muted-foreground); font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.75; }
+.hero-subtitle { margin-top: 24px; color: var(--foreground); font-size: clamp(1.15rem, 1.8vw, 1.4rem); font-weight: 500; line-height: 1.4; }
+.hero-copy, .section-copy { max-width: 590px; margin-top: 16px; color: var(--muted-foreground); font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.75; }
 .belief-field { position: relative; min-height: min(610px, 66vw); isolation: isolate; }
 .aurora { position: absolute; filter: blur(58px); opacity: .28; border-radius: 50%; animation: aurora-drift 12s ease-in-out infinite alternate; }
 .aurora-one { width: 310px; height: 240px; top: 18%; left: 18%; background: var(--primary); }
