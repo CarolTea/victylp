@@ -11,9 +11,9 @@ import { joinEarlyAccess } from "@/lib/early-access.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VicTy — Invest in a thesis, not a ticker" },
+      { title: "VicTy — Invest in what you believe" },
       { name: "description", content: "Turn what you believe about the future into an investment thesis you can understand and control." },
-      { property: "og:title", content: "VicTy — Invest in a thesis, not a ticker" },
+      { property: "og:title", content: "VicTy — Invest in what you believe" },
       { property: "og:description", content: "Turn what you believe about the future into an investment thesis you can understand and control." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -93,7 +93,8 @@ function Hero() {
       <div className="hero-grid page-width">
         <div className="relative z-10 pt-24 lg:pt-0">
           <div className="eyebrow"><span className="signal-dot" /> BUILT ON SOLANA</div>
-          <h1 className="hero-title">Invest in a thesis,<br /><span>not a ticker.</span></h1>
+          <h1 className="hero-title">Invest in what<br /><span>you believe.</span></h1>
+          <p className="hero-subtitle">Invest in a thesis, not a ticker.</p>
           <p className="hero-copy">You see where the world is going.<br className="hidden sm:block" /> VicTy helps turn that conviction into an investment thesis you can understand.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <ArrowLink onClick={() => scrollTo("waitlist")}>Join the waitlist</ArrowLink>
@@ -237,7 +238,7 @@ function Waitlist() {
 }
 
 function Footer() {
-  return <footer className="site-footer"><div className="page-width"><div className="footer-main"><div><VicTyLogo /><p>Invest in a thesis, not a ticker.</p></div><nav aria-label="Footer navigation">{["Product", "Privacy", "Terms", "X", "LinkedIn"].map((link) => <span key={link}>{link}</span>)}</nav></div><div className="footer-bottom"><p>Built by women. Built on Solana.</p><p>VicTy doesn’t provide financial advice.</p><p>© 2026 VicTy</p></div></div></footer>;
+  return <footer className="site-footer"><div className="page-width"><div className="footer-main"><div><VicTyLogo /><p>Invest in what you believe.</p></div><nav aria-label="Footer navigation">{["Product", "Privacy", "Terms", "X", "LinkedIn"].map((link) => <span key={link}>{link}</span>)}</nav></div><div className="footer-bottom"><p>Built by women. Built on Solana.</p><p>VicTy doesn’t provide financial advice.</p><p>© 2026 VicTy</p></div></div></footer>;
 }
 
 function Index() {
