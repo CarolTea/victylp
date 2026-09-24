@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/logo-victy.png.asset.json";
+import logoAsset from "@/assets/logo-victy-transparent.png.asset.json";
 
 export function VicTyLogo({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
