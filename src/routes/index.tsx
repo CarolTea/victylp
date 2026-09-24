@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowDown, ArrowRight, Check, ChevronRight, Menu, Minus, RotateCcw, X } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { VicTyLogo } from "@/components/victy-logo";
 import { cn } from "@/lib/utils";
+import { joinEarlyAccess } from "@/lib/early-access.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -121,7 +123,7 @@ function BeliefToStructure() {
           <div className="exposure-list">
             {["Semiconductors", "Data centers", "Energy infrastructure"].map((item, index) => <div key={item} className="exposure-item" style={{ "--item-delay": `${index * 180}ms` } as React.CSSProperties}><span>0{index + 1}</span>{item}</div>)}
           </div>
-          <div className="instrument-list"><span className="mono-label">POSSIBLE INSTRUMENTS</span><span>SOXX</span><span>EQIX</span><span>NEE</span></div>
+          <div className="instrument-list"><span className="mono-label">POSSIBLE INSTRUMENTS · ILLUSTRATIVE</span><span><strong>NVDA</strong> NVIDIA</span><span><strong>EQIX</strong> Equinix</span><span><strong>NEE</strong> NextEra Energy</span></div>
         </Reveal>
       </div>
     </section>
@@ -204,17 +206,34 @@ function About() {
 }
 
 function Waitlist() {
-  const [email, setEmail] = useState("");
+  const submitSignup = useServerFn(joinEarlyAccess);
+  const [fields, setFields] = useState({ name: "", whatsapp: "", email: "", website: "" });
   const [error, setError] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const value = email.trim();
-    if (!value || value.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { setError("Enter a valid email address."); return; }
-    setError(""); setStatus("loading");
-    window.setTimeout(() => setStatus("success"), 850);
+  const updateField = (field: keyof typeof fields, value: string) => {
+    setFields((current) => ({ ...current, [field]: value }));
+    if (error) setError("");
   };
-  return <section id="waitlist" className="waitlist-section section-shell"><div className="page-width"><Reveal className="waitlist-panel"><div className="waitlist-aurora" />{status === "success" ? <div className="success-state" role="status"><span className="success-icon"><Check /></span><p className="eyebrow">EARLY ACCESS</p><h2>You’re on the list.</h2><p>We’ll let you know when VicTy is ready for you.</p></div> : <div className="relative z-10 max-w-3xl"><p className="eyebrow">EARLY ACCESS</p><h2>What do you<br /><span className="gradient-text">believe in?</span></h2><p>We’re building a different way to turn conviction into investment decisions. Be among the first to experience VicTy.</p><form onSubmit={submit} noValidate><label htmlFor="waitlist-email" className="sr-only">Email address</label><div className={cn("email-field", error && "has-error")}><input id="waitlist-email" type="email" autoComplete="email" maxLength={254} value={email} onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }} placeholder="Email address" aria-invalid={Boolean(error)} aria-describedby="email-help" disabled={status === "loading"} /><Button type="submit" size="lg" disabled={status === "loading"}>{status === "loading" ? "Joining…" : "Join the waitlist"}<ArrowRight className="size-4" /></Button></div><p id="email-help" className={cn("form-note", error && "text-destructive")} role={error ? "alert" : undefined}>{error || "No spam. Just meaningful VicTy updates and early-access invitations."}</p></form></div>}</Reveal></div></section>;
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    const name = fields.name.trim();
+    const email = fields.email.trim();
+    const phoneDigits = fields.whatsapp.replace(/\D/g, "");
+    if (name.length < 2 || name.length > 100) { setError("Enter your full name."); return; }
+    if (phoneDigits.length < 8 || phoneDigits.length > 15 || phoneDigits.startsWith("0")) { setError("Enter your WhatsApp with country code."); return; }
+    if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email address."); return; }
+    setError(""); setStatus("loading");
+    try {
+      const result = await submitSignup({ data: { ...fields, name, email, whatsapp: `+${phoneDigits}` } });
+      if (result.ok) { setStatus("success"); return; }
+      setStatus("idle");
+      setError(result.reason === "duplicate" ? "This email or WhatsApp is already on the list." : result.reason === "invalid" ? "Check your details and try again." : "We couldn’t save your details. Please try again.");
+    } catch {
+      setStatus("idle");
+      setError("We couldn’t save your details. Please try again.");
+    }
+  };
+  return <section id="waitlist" className="waitlist-section section-shell"><div className="page-width"><Reveal className="waitlist-panel"><div className="waitlist-aurora" />{status === "success" ? <div className="success-state" role="status"><span className="success-icon"><Check /></span><p className="eyebrow">EARLY ACCESS</p><h2>You’re on the list.</h2><p>We’ll let you know when VicTy is ready for you.</p></div> : <div className="relative z-10 max-w-3xl"><p className="eyebrow">EARLY ACCESS</p><h2>What do you<br /><span className="gradient-text">believe in?</span></h2><p>We’re building a different way to turn conviction into investment decisions. Be among the first to experience VicTy.</p><form onSubmit={submit} noValidate><div className="signup-fields"><label><span>Full name</span><input type="text" autoComplete="name" maxLength={100} value={fields.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Your name" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>WhatsApp</span><input type="tel" inputMode="tel" autoComplete="tel" maxLength={24} value={fields.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="+55 11 99999 9999" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>Email address</span><input type="email" autoComplete="email" maxLength={254} value={fields.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" aria-invalid={Boolean(error)} aria-describedby="signup-help" disabled={status === "loading"} /></label><label className="signup-trap" aria-hidden="true"><span>Website</span><input tabIndex={-1} autoComplete="off" value={fields.website} onChange={(e) => updateField("website", e.target.value)} /></label><Button type="submit" size="lg" disabled={status === "loading"}>{status === "loading" ? "Joining…" : "Join the waitlist"}<ArrowRight className="size-4" /></Button></div><p id="signup-help" className={cn("form-note", error && "text-destructive")} role={error ? "alert" : undefined}>{error || "Your details stay private. No spam — only meaningful VicTy updates."}</p></form></div>}</Reveal></div></section>;
 }
 
 function Footer() {
