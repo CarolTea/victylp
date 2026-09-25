@@ -8,3 +8,4 @@
 - [x] Replace the reconstructed logo and favicon with the official assets
 - [x] Use real illustrative instruments in the thesis story
 - [x] Store validated early-access registrations in Lovable Cloud
+- [x] Add the animated VicTy characters to the women-built and success sections
