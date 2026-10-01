@@ -15,7 +15,7 @@ export interface PriceProvider { plannedUsd(asset: DemoAsset, portfolioValue: nu
 export interface ExecutionProvider { simulate(asset: DemoAsset, amount: number, walletConnected: boolean): Promise<SimulatedInvestment>; }
 
 const makeMessage = (role: DemoMessage["role"], text: string, options?: string[]): DemoMessage => ({
-  id: crypto.randomUUID(), role, text, options,
+  id: crypto.randomUUID(), role, text, ...(options ? { options } : {}),
 });
 
 export class MockAIProvider implements AIProvider {
@@ -54,7 +54,7 @@ export class MockAIProvider implements AIProvider {
 }
 
 export class MockAssetCatalogProvider implements AssetCatalogProvider {
-  async listForThesis() {
+  async listForThesis(_exposures: Exposure[]): Promise<DemoAsset[]> {
     return [
       { id: "nvda", ticker: "NVDA", name: "NVIDIA", allocation: 35, exposure: "Accelerated compute", why: "Direct exposure to AI compute demand", risks: "Valuation · concentration · semiconductor cycle", availability: "Demo route", category: "Equity", price: 172.4, active: true },
       { id: "amd", ticker: "AMD", name: "Advanced Micro Devices", allocation: 15, exposure: "Compute alternatives", why: "Diversifies semiconductor exposure", risks: "Competition · execution · cyclicality", availability: "Demo route", category: "Equity", price: 204.1, active: true },
@@ -68,7 +68,7 @@ export class MockAssetCatalogProvider implements AssetCatalogProvider {
 export class MockPriceProvider implements PriceProvider { plannedUsd(asset: DemoAsset, portfolioValue: number) { return Math.round(portfolioValue * asset.allocation / 100); } }
 export class MockWalletProvider implements WalletProvider { async getDemoWallet(connected: boolean) { return connected ? { connected: true, address: "7Xp8...B49H", network: "Solana Devnet" } : { connected: false }; } }
 export class MockExecutionProvider implements ExecutionProvider {
-  async simulate(asset: DemoAsset, amount: number, walletConnected: boolean) {
+  async simulate(asset: DemoAsset, amount: number, walletConnected: boolean): Promise<SimulatedInvestment> {
     if (!walletConnected) throw new Error("wallet_required");
     return { id: crypto.randomUUID(), assetId: asset.id, ticker: asset.ticker, amount, provider: "Jupiter", route: `USDC → ${asset.ticker}`, status: "simulated", createdAt: new Date().toISOString() };
   }

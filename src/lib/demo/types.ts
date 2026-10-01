@@ -4,7 +4,7 @@ export type DemoMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
-  options?: string[];
+  options?: string[] | undefined;
 };
 
 export type Exposure = {
