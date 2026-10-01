@@ -9,8 +9,7 @@
 - [x] Use real illustrative instruments in the thesis story
 - [x] Store validated early-access registrations in Lovable Cloud
 - [x] Add the animated VicTy characters to the women-built and success sections
-
 - [ ] Build the interactive /demo journey
-- [ ] Add secure anonymous demo persistence
+- [x] Add secure anonymous demo persistence
 - [ ] Add homepage access to the demo
 - [ ] Validate the complete demo on desktop and mobile
