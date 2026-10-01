@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowDown, ArrowRight, Check, ChevronRight, Menu, Minus, RotateCcw, X } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
@@ -51,6 +51,7 @@ function Navigation() {
         <button className="nav-link" onClick={() => navigate("how-it-works")}>How it works</button>
         <button className="nav-link" onClick={() => navigate("why-victy")}>Why VicTy</button>
         <button className="nav-link" onClick={() => navigate("about")}>About</button>
+        <Link to="/demo" className="nav-link">Try the demo</Link>
         <Button size="sm" onClick={() => navigate("waitlist")}>Join the waitlist <ArrowRight className="size-3.5" /></Button>
       </nav>
       <Button variant="icon" size="icon" className="md:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open}>
@@ -61,6 +62,7 @@ function Navigation() {
           {([["How it works", "how-it-works"], ["Why VicTy", "why-victy"], ["About", "about"]] as const).map(([label, id]) => (
             <button key={id} onClick={() => navigate(id)}>{label}<ChevronRight className="size-4" /></button>
           ))}
+          <Button asChild variant="ghost"><Link to="/demo">Try the demo <ArrowRight className="size-4" /></Link></Button>
           <Button onClick={() => navigate("waitlist")}>Join the waitlist <ArrowRight className="size-4" /></Button>
         </nav>
       )}

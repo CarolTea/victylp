@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      demo_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          secret_hash: string
+          state: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          secret_hash: string
+          state?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          secret_hash?: string
+          state?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       early_access_signups: {
         Row: {
           created_at: string
