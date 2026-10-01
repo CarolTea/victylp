@@ -13,3 +13,6 @@
 - [x] Add secure anonymous demo persistence
 - [x] Add homepage access to the demo
 - [x] Validate the complete demo on desktop and mobile
+- [x] Add passwordless user access and private profiles
+- [x] Persist simulated theses and deterministic performance
+- [x] Add the private thesis dashboard and detail view

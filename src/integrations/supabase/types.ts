@@ -14,6 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
+      composition_assets: {
+        Row: {
+          allocation_percent: number
+          asset_id: string
+          category: string
+          composition_id: string
+          created_at: string
+          current_simulated_price: number
+          current_value: number
+          exposure: string
+          id: string
+          initial_simulated_price: number
+          initial_value: number
+          name: string
+          risks: string
+          ticker: string
+          user_id: string
+          why: string
+        }
+        Insert: {
+          allocation_percent: number
+          asset_id: string
+          category: string
+          composition_id: string
+          created_at?: string
+          current_simulated_price: number
+          current_value: number
+          exposure: string
+          id?: string
+          initial_simulated_price: number
+          initial_value: number
+          name: string
+          risks: string
+          ticker: string
+          user_id: string
+          why: string
+        }
+        Update: {
+          allocation_percent?: number
+          asset_id?: string
+          category?: string
+          composition_id?: string
+          created_at?: string
+          current_simulated_price?: number
+          current_value?: number
+          exposure?: string
+          id?: string
+          initial_simulated_price?: number
+          initial_value?: number
+          name?: string
+          risks?: string
+          ticker?: string
+          user_id?: string
+          why?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "composition_assets_composition_id_fkey"
+            columns: ["composition_id"]
+            isOneToOne: false
+            referencedRelation: "compositions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "composition_assets_owner_fkey"
+            columns: ["composition_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "compositions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "composition_assets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compositions: {
+        Row: {
+          created_at: string
+          current_simulated_value: number
+          id: string
+          initial_amount: number
+          thesis_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_simulated_value: number
+          id?: string
+          initial_amount: number
+          thesis_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_simulated_value?: number
+          id?: string
+          initial_amount?: number
+          thesis_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compositions_thesis_id_fkey"
+            columns: ["thesis_id"]
+            isOneToOne: true
+            referencedRelation: "theses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compositions_thesis_owner_fkey"
+            columns: ["thesis_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "theses"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "compositions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_sessions: {
         Row: {
           created_at: string
@@ -61,6 +192,123 @@ export type Database = {
           whatsapp?: string
         }
         Relationships: []
+      }
+      performance_snapshots: {
+        Row: {
+          composition_id: string
+          created_at: string
+          id: string
+          snapshot_date: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          composition_id: string
+          created_at?: string
+          id?: string
+          snapshot_date: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          composition_id?: string
+          created_at?: string
+          id?: string
+          snapshot_date?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_snapshots_composition_id_fkey"
+            columns: ["composition_id"]
+            isOneToOne: false
+            referencedRelation: "compositions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_snapshots_owner_fkey"
+            columns: ["composition_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "compositions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "performance_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      theses: {
+        Row: {
+          created_at: string
+          demo_session_id: string | null
+          id: string
+          interpreted_thesis: string
+          original_belief: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          demo_session_id?: string | null
+          id?: string
+          interpreted_thesis: string
+          original_belief: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          demo_session_id?: string | null
+          id?: string
+          interpreted_thesis?: string
+          original_belief?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

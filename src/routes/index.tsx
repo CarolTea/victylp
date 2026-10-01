@@ -7,6 +7,7 @@ import { Reveal } from "@/components/reveal";
 import { VicTyLogo } from "@/components/victy-logo";
 import { cn } from "@/lib/utils";
 import { joinEarlyAccess } from "@/lib/early-access.functions";
+import { supabase } from "@/integrations/supabase/client";
 import victyFrontAsset from "@/assets/victy-front-transparent.png.asset.json";
 import victySunglassesAsset from "@/assets/victy-sunglasses-transparent.png.asset.json";
 
@@ -37,12 +38,14 @@ function ArrowLink({ children, onClick, variant = "primary" }: { children: React
 function Navigation() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user))); const { data } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(Boolean(session?.user))); return () => data.subscription.unsubscribe(); }, []);
   const navigate = (id: string) => { setOpen(false); scrollTo(id); };
   return (
     <header className={cn("site-nav", scrolled && "is-scrolled")}>
@@ -52,6 +55,7 @@ function Navigation() {
         <button className="nav-link" onClick={() => navigate("why-victy")}>Why VicTy</button>
         <button className="nav-link" onClick={() => navigate("about")}>About</button>
         <Link to="/demo" className="nav-link">Try the demo</Link>
+        {signedIn ? <Link to="/dashboard" className="nav-link">My theses</Link> : <Link to="/auth" search={{ next: "dashboard" }} className="nav-link">Access</Link>}
         <Button size="sm" onClick={() => navigate("waitlist")}>Join the waitlist <ArrowRight className="size-3.5" /></Button>
       </nav>
       <Button variant="icon" size="icon" className="md:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open}>
@@ -63,6 +67,7 @@ function Navigation() {
             <button key={id} onClick={() => navigate(id)}>{label}<ChevronRight className="size-4" /></button>
           ))}
           <Button asChild variant="ghost"><Link to="/demo">Try the demo <ArrowRight className="size-4" /></Link></Button>
+          <Button asChild variant="ghost">{signedIn ? <Link to="/dashboard">My theses <ArrowRight className="size-4" /></Link> : <Link to="/auth" search={{ next: "dashboard" }}>Access <ArrowRight className="size-4" /></Link>}</Button>
           <Button onClick={() => navigate("waitlist")}>Join the waitlist <ArrowRight className="size-4" /></Button>
         </nav>
       )}
