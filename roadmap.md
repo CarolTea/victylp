@@ -12,4 +12,4 @@
 - [x] Build the interactive /demo journey
 - [x] Add secure anonymous demo persistence
 - [x] Add homepage access to the demo
-- [ ] Validate the complete demo on desktop and mobile
+- [x] Validate the complete demo on desktop and mobile
