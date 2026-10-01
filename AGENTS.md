@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep external product integrations behind provider interfaces so mocked AI, wallet, catalog, price, and execution services can be replaced without rewriting the UI.
+- Keep authenticated thesis data behind owner-scoped RLS and authenticated server functions so user identity never comes from browser input.
