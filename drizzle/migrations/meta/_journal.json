@@ -36,6 +36,13 @@
       "when": 1790876712612,
       "tag": "0004_enforce_thesis_ownership_relations",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790932685730,
+      "tag": "0005_demo_wallet_approval_challenges",
+      "breakpoints": true
     }
   ]
 }

@@ -169,6 +169,47 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_wallet_approval_challenges: {
+        Row: {
+          challenge: Json
+          consumed_at: string | null
+          created_at: string
+          demo_session_id: string
+          expires_at: string
+          id: string
+          nonce: string
+          wallet_address: string
+        }
+        Insert: {
+          challenge: Json
+          consumed_at?: string | null
+          created_at?: string
+          demo_session_id: string
+          expires_at: string
+          id: string
+          nonce: string
+          wallet_address: string
+        }
+        Update: {
+          challenge?: Json
+          consumed_at?: string | null
+          created_at?: string
+          demo_session_id?: string
+          expires_at?: string
+          id?: string
+          nonce?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_wallet_approval_challenges_demo_session_id_fkey"
+            columns: ["demo_session_id"]
+            isOneToOne: false
+            referencedRelation: "demo_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       early_access_signups: {
         Row: {
           created_at: string
@@ -315,7 +356,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_demo_wallet_approval: {
+        Args: { challenge_id: string; session_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
