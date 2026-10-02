@@ -40,7 +40,14 @@ function AuthPage() {
   useEffect(() => {
     const finish = () =>
       void supabase.auth.getUser().then(({ data }) => {
-        if (data.user) void navigate({ to: "/dashboard", replace: true });
+        if (data.user) {
+          if (
+            window.localStorage.getItem("victy_pending_save") &&
+            !window.localStorage.getItem("victy_pending_user")
+          )
+            window.localStorage.setItem("victy_pending_user", data.user.id);
+          void navigate({ to: "/dashboard", replace: true });
+        }
       });
     finish();
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -62,7 +69,8 @@ function AuthPage() {
     setLoading(true);
     if (next === "save") {
       window.localStorage.setItem("victy_pending_name", name.trim());
-      window.localStorage.setItem("victy_pending_save", "1");
+      if (!window.localStorage.getItem("victy_pending_save"))
+        window.localStorage.setItem("victy_pending_save", "1");
     }
     const redirectTo = `${window.location.origin}/auth?next=${next}`;
     const options =

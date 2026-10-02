@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ArrowRight, Check, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { VicTyLogo } from "@/components/victy-logo";
 import { DemoChat } from "@/components/demo/demo-chat";
@@ -29,6 +29,9 @@ const examples = [
 ];
 
 export const Route = createFileRoute("/demo")({
+  validateSearch: (search: Record<string, unknown>): { fresh?: boolean | undefined } => ({
+    fresh: search["fresh"] === true || search["fresh"] === "true" ? true : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Interactive Product Demo — VicTy" },
@@ -51,6 +54,12 @@ export const Route = createFileRoute("/demo")({
 
 function DemoPage() {
   const navigate = useNavigate();
+  const { fresh } = Route.useSearch();
+  const initialized = useRef(false);
+  const resetLock = useRef(false);
+  const trackLock = useRef(false);
+  const syncQueue = useRef(Promise.resolve());
+  const [tracking, setTracking] = useState(false);
   const createSession = useServerFn(createDemoSession);
   const loadSession = useServerFn(loadDemoSession);
   const saveSession = useServerFn(saveDemoSession);
@@ -71,10 +80,12 @@ function DemoPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [state.step]);
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
     void (async () => {
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (raw) {
+        if (raw && !fresh) {
           const saved = JSON.parse(raw) as DemoSessionCredentials & { state?: DemoState };
           const result = await loadSession({ data: saved });
           if (result.ok) {
@@ -87,23 +98,34 @@ function DemoPage() {
         const created = await createSession();
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(created));
         setCredentials(created);
+        if (fresh) {
+          window.localStorage.removeItem("victy_pending_save");
+          window.localStorage.removeItem("victy_pending_user");
+          window.localStorage.removeItem("victy_pending_name");
+          await navigate({ to: "/demo", search: {}, replace: true });
+        }
       } catch {
         setError("The demo session could not be prepared. Please refresh and try again.");
       } finally {
         setReady(true);
       }
     })();
-  }, [createSession, loadSession]);
+  }, [createSession, loadSession, fresh, navigate]);
   const updateState = useCallback(
     (next: DemoState) => {
       setState(next);
       if (credentials) {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...credentials, state: next }));
-        void saveSession({ data: { ...credentials, state: next } }).catch(() => {
-          setError(
-            "Your progress is saved in this browser, but could not sync. Please try again before switching devices.",
-          );
-        });
+        syncQueue.current = syncQueue.current
+          .then(async () => {
+            const result = await saveSession({ data: { ...credentials, state: next } });
+            if (!result.ok) throw new Error("Demo sync failed");
+          })
+          .catch(() => {
+            setError(
+              "Your progress is saved in this browser, but could not sync. Please try again before switching devices.",
+            );
+          });
       }
     },
     [credentials, saveSession],
@@ -171,9 +193,32 @@ function DemoPage() {
       setPending(false);
     }
   };
-  const reset = () => {
-    provider?.clearApproval();
-    updateState(emptyDemoState);
+  const reset = async () => {
+    if (resetLock.current || pending || tracking || wallet.status === "signing") return;
+    resetLock.current = true;
+    setPending(true);
+    setError("");
+    try {
+      const created = await createSession();
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ ...created, state: emptyDemoState }),
+      );
+      window.localStorage.removeItem("victy_pending_save");
+      window.localStorage.removeItem("victy_pending_user");
+      window.localStorage.removeItem("victy_pending_name");
+      setCredentials(created);
+      setState(emptyDemoState);
+      setDraft("");
+      provider?.clearApproval();
+    } catch {
+      setError(
+        "A new demo could not be created. Your previous demo is still available. Please try again.",
+      );
+    } finally {
+      resetLock.current = false;
+      setPending(false);
+    }
   };
   if (!ready)
     return (
@@ -222,7 +267,12 @@ function DemoPage() {
             </span>
           ))}
         </div>
-        <Button variant="ghost" size="sm" onClick={reset}>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={pending || tracking || wallet.status === "signing"}
+          onClick={() => void reset()}
+        >
           <RotateCcw /> Start over
         </Button>
       </header>
@@ -366,16 +416,26 @@ function DemoPage() {
               verify: (input) => verifyApproval({ data: { ...input, credentials } }),
             });
           }}
+          tracking={tracking}
           onTrack={() => {
-            window.localStorage.setItem("victy_pending_save", "1");
+            if (trackLock.current || !credentials) return;
+            trackLock.current = true;
+            setTracking(true);
+            window.localStorage.setItem("victy_pending_save", credentials.id);
             void supabase.auth
               .getUser()
-              .then(({ data }) =>
-                navigate(
+              .then(async ({ data }) => {
+                if (data.user) window.localStorage.setItem("victy_pending_user", data.user.id);
+                else window.localStorage.removeItem("victy_pending_user");
+                await navigate(
                   data.user ? { to: "/dashboard" } : { to: "/auth", search: { next: "save" } },
-                ),
-              )
-              .catch(() => setError("Could not open your thesis. Please try again."));
+                );
+              })
+              .catch(() => setError("Could not open your thesis. Please try again."))
+              .finally(() => {
+                trackLock.current = false;
+                setTracking(false);
+              });
           }}
         />
       )}

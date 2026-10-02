@@ -158,6 +158,7 @@ export function CompositionWorkspace({
   onAsk,
   onSimulate,
   onTrack,
+  tracking,
   wallet,
   walletReady,
   onConnect,
@@ -174,6 +175,7 @@ export function CompositionWorkspace({
   onAsk: (question: string) => Promise<string>;
   onSimulate: (asset: DemoAsset, amount: number) => Promise<SimulatedInvestment>;
   onTrack: () => void;
+  tracking: boolean;
 }) {
   const [approving, setApproving] = useState(false);
   const approvalLock = useRef(false);
@@ -498,8 +500,8 @@ export function CompositionWorkspace({
                     <strong>Your wallet approval was verified.</strong>
                     <p>Save this composition to track its simulated performance.</p>
                   </div>
-                  <Button onClick={onTrack}>
-                    View my thesis <ArrowRight />
+                  <Button onClick={onTrack} disabled={tracking}>
+                    {tracking ? "Opening your thesis…" : "View my thesis"} <ArrowRight />
                   </Button>
                   <Button variant="ghost" onClick={close}>
                     Return to composition

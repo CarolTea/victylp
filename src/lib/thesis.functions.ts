@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 import { performanceProvider } from "./thesis/performance";
 import { mapThesis, selection, type ThesisRow } from "./thesis/queries";
 
@@ -48,11 +49,12 @@ export const saveTrackedThesis = createServerFn({ method: "POST" })
       typeof context.claims.email === "string" ? context.claims.email.toLowerCase() : "";
     if (!email) throw new Error("Authenticated email unavailable");
     const cleanName = data.name?.trim().replace(/\s+/g, " ") ?? "";
-    const { data: existingProfile } = await supabaseAdmin
+    const { data: existingProfile, error: profileError } = await supabaseAdmin
       .from("profiles")
       .select("id, name")
       .eq("id", context.userId)
       .maybeSingle();
+    if (profileError) throw new Error("Profile could not be checked. Please try again.");
     let profileName = cleanName;
     if (!existingProfile) {
       const { data: lead } = await supabaseAdmin
@@ -71,22 +73,23 @@ export const saveTrackedThesis = createServerFn({ method: "POST" })
         profileName = context.claims.user_metadata["name"];
       if (profileName.length < 2)
         profileName = email.split("@")[0]?.slice(0, 100) || "VicTy member";
-      const { error } = await supabaseAdmin
-        .from("profiles")
-        .insert({ id: context.userId, email, name: profileName });
-      if (error) throw new Error("Profile could not be saved");
-    } else if (cleanName.length >= 2 && existingProfile.name !== cleanName)
-      await supabaseAdmin.from("profiles").update({ name: cleanName }).eq("id", context.userId);
-
-    const { data: existing } = await supabaseAdmin
+    }
+    profileName = (existingProfile?.name || profileName).slice(0, 100);
+    if (profileName.length < 2) profileName = "VicTy member";
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from("theses")
-      .select("id")
+      .select("created_at")
       .eq("demo_session_id", data.credentials.id)
       .eq("user_id", context.userId)
       .maybeSingle();
-    if (existing) return { thesisId: existing.id };
+    if (existingError) throw new Error("Thesis could not be checked. Please try again.");
     const activeAssets = data.assets.filter((asset) => asset.active && asset.allocation > 0);
-    const createdAt = new Date();
+    if (
+      !activeAssets.length ||
+      new Set(activeAssets.map((asset) => asset.id)).size !== activeAssets.length
+    )
+      throw new Error("Choose at least one asset, without duplicates, before saving.");
+    const createdAt = existing ? new Date(existing.created_at) : new Date();
     const initialAmount = 1000;
     const generated = performanceProvider.generate(
       data.credentials.id,
@@ -98,35 +101,10 @@ export const saveTrackedThesis = createServerFn({ method: "POST" })
     const title = data.belief.toLowerCase().includes("ai")
       ? "AI Infrastructure"
       : `${activeAssets[0]?.exposure ?? "Investment"} thesis`;
-    const { data: thesis, error: thesisError } = await supabaseAdmin
-      .from("theses")
-      .insert({
-        user_id: context.userId,
-        demo_session_id: data.credentials.id,
-        title,
-        original_belief: data.belief,
-        interpreted_thesis: data.interpretation,
-      })
-      .select("id")
-      .single();
-    if (thesisError || !thesis) throw new Error("Thesis could not be saved");
-    const { data: composition, error: compositionError } = await supabaseAdmin
-      .from("compositions")
-      .insert({
-        thesis_id: thesis.id,
-        user_id: context.userId,
-        initial_amount: initialAmount,
-        current_simulated_value: currentValue,
-      })
-      .select("id")
-      .single();
-    if (compositionError || !composition) throw new Error("Composition could not be saved");
     const assetRows = activeAssets.map((asset) => {
       const multiplier = generated.assetMultipliers[asset.id] ?? 1;
       const initialValue = (initialAmount * asset.allocation) / 100;
       return {
-        composition_id: composition.id,
-        user_id: context.userId,
         asset_id: asset.id,
         ticker: asset.ticker,
         name: asset.name,
@@ -141,17 +119,30 @@ export const saveTrackedThesis = createServerFn({ method: "POST" })
         risks: asset.risks,
       };
     });
-    const { error: assetsError } = await supabaseAdmin.from("composition_assets").insert(assetRows);
-    const { error: snapshotsError } = await supabaseAdmin.from("performance_snapshots").insert(
-      generated.snapshots.map((snapshot) => ({
-        composition_id: composition.id,
-        user_id: context.userId,
-        value: snapshot.value,
-        snapshot_date: snapshot.date,
-      })),
+    const { data: thesisId, error: saveError } = await supabaseAdmin.rpc(
+      "save_tracked_thesis_atomic",
+      {
+        owner_id: context.userId,
+        session_id: data.credentials.id,
+        payload: {
+          email,
+          name: profileName,
+          title: title.slice(0, 120),
+          belief: data.belief,
+          interpretation: data.interpretation,
+          currentValue,
+          assets: assetRows,
+          snapshots: generated.snapshots,
+        } as unknown as Json,
+      },
     );
-    if (assetsError || snapshotsError) throw new Error("Performance could not be saved");
-    return { thesisId: thesis.id };
+    if (saveError || !thesisId) {
+      console.error("Thesis persistence failed", { code: saveError?.code });
+      if (saveError?.message.includes("Start a new demo"))
+        throw new Error("This demo was already saved. Use Start over to save a different thesis.");
+      throw new Error("Your thesis could not be saved. Please try again.");
+    }
+    return { thesisId };
   });
 
 export const listMyTheses = createServerFn({ method: "GET" })
@@ -168,8 +159,9 @@ export const listMyTheses = createServerFn({ method: "GET" })
 
 export const getMyThesis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) => z.object({ id: z.string().max(100) }).parse(input))
   .handler(async ({ data, context }) => {
+    if (!z.string().uuid().safeParse(data.id).success) return null;
     const { data: row, error } = await context.supabase
       .from("theses")
       .select(selection)
@@ -178,5 +170,10 @@ export const getMyThesis = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error("Thesis could not be loaded");
     if (!row) return null;
-    return mapThesis(row as unknown as ThesisRow);
+    const thesis = mapThesis(row as unknown as ThesisRow);
+    if (!thesis.assets.length || thesis.snapshots.length !== 31)
+      throw new Error(
+        "This thesis was not fully saved. Return to the original demo and retry saving.",
+      );
+    return thesis;
   });

@@ -55,7 +55,11 @@ function ThesisPage() {
       <main className="dashboard-page">
         <DashboardHeader />
         <div className="demo-error" role="alert">
-          <p>Your thesis could not be loaded. Please try again.</p>
+          <p>
+            {query.error instanceof Error
+              ? query.error.message
+              : "Your thesis could not be loaded. Please try again."}
+          </p>
           <Button
             variant="outline"
             onClick={() => void query.refetch()}
@@ -100,6 +104,9 @@ function ThesisPage() {
           <p>{thesis.belief}</p>
         </header>
         <section className="detail-section">
+          <p className="demo-disclaimer" role="status">
+            Your thesis is now being tracked.
+          </p>
           <p className="eyebrow">YOUR THESIS</p>
           <h2>What you believe</h2>
           <blockquote>{thesis.interpretation}</blockquote>

@@ -43,6 +43,13 @@
       "when": 1790932685730,
       "tag": "0005_demo_wallet_approval_challenges",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790945590359,
+      "tag": "0006_atomic_thesis_save",
+      "breakpoints": true
     }
   ]
 }

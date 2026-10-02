@@ -40,20 +40,43 @@ function DashboardPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const attemptedSave = useRef(false);
+  const [retrySave, setRetrySave] = useState(0);
   const { user } = Route.useRouteContext();
   const query = useQuery({ queryKey: ["my-theses", user.id], queryFn: () => list(), retry: false });
   useEffect(() => {
-    if (attemptedSave.current || window.localStorage.getItem("victy_pending_save") !== "1") return;
+    const marker = window.localStorage.getItem("victy_pending_save");
+    if (attemptedSave.current || !marker) return;
+    const pendingUser = window.localStorage.getItem("victy_pending_user");
+    if (pendingUser && pendingUser !== user.id) {
+      setSaveError(
+        "This pending thesis belongs to another sign-in. Sign in with that account or start a new demo.",
+      );
+      return;
+    }
     const name = window.localStorage.getItem("victy_pending_name") ?? "";
     const raw = window.localStorage.getItem(DEMO_KEY);
-    if (!raw) return;
+    if (!raw) {
+      setSaveError("The pending demo is missing in this browser. Return to the demo to save it.");
+      return;
+    }
     let pending: (DemoSessionCredentials & { state?: DemoState }) | null = null;
     try {
       pending = JSON.parse(raw) as DemoSessionCredentials & { state?: DemoState };
     } catch {
+      setSaveError("The pending demo could not be read. Return to the demo before saving.");
       return;
     }
-    if (!pending?.state?.interpretation || !pending.state.assets.length) return;
+    if (
+      !pending?.state?.interpretation ||
+      !pending.state.assets?.length ||
+      (marker !== "1" && marker !== pending.id)
+    ) {
+      setSaveError(
+        "The pending demo is incomplete or has changed. Return to the demo before saving.",
+      );
+      return;
+    }
+    window.localStorage.setItem("victy_pending_user", user.id);
     attemptedSave.current = true;
     setSaving(true);
     setSaveError("");
@@ -68,13 +91,22 @@ function DashboardPage() {
     })
       .then(async ({ thesisId }) => {
         window.localStorage.removeItem("victy_pending_name");
-        window.localStorage.removeItem("victy_pending_save");
+        if (window.localStorage.getItem("victy_pending_save") === marker) {
+          window.localStorage.removeItem("victy_pending_save");
+          window.localStorage.removeItem("victy_pending_user");
+        }
         void queryClient.invalidateQueries({ queryKey: ["my-theses"] });
         await navigate({ to: "/dashboard/thesis/$id", params: { id: thesisId }, replace: true });
       })
-      .catch(() => setSaveError("Your thesis could not be saved yet. Refresh to try again."))
+      .catch((error: unknown) =>
+        setSaveError(
+          error instanceof Error
+            ? error.message
+            : "Your thesis could not be saved. Please try again.",
+        ),
+      )
       .finally(() => setSaving(false));
-  }, [navigate, queryClient, save]);
+  }, [navigate, queryClient, save, user.id, retrySave]);
   return (
     <main className="dashboard-page">
       <DashboardHeader />
@@ -88,7 +120,7 @@ function DashboardPage() {
             <p>Your ideas, translated into positions.</p>
           </div>
           <Button asChild>
-            <Link to="/demo">
+            <Link to="/demo" search={{ fresh: true }}>
               <Plus /> New thesis
             </Link>
           </Button>
@@ -96,7 +128,18 @@ function DashboardPage() {
         {saving && <div className="dashboard-loading">Saving your thesis…</div>}
         {saveError && (
           <div className="demo-error" role="alert">
-            {saveError}
+            <p>{saveError}</p>
+            <Button
+              variant="outline"
+              disabled={saving}
+              onClick={() => {
+                attemptedSave.current = false;
+                setSaveError("");
+                setRetrySave((value) => value + 1);
+              }}
+            >
+              Retry saving
+            </Button>
           </div>
         )}
         {query.isLoading ? (
@@ -171,7 +214,7 @@ function DashboardPage() {
               <h2>Start with what you believe.</h2>
               <p>Explore an idea, build a composition and simulate your first position.</p>
               <Button asChild>
-                <Link to="/demo">
+                <Link to="/demo" search={{ fresh: true }}>
                   Create a thesis <ArrowRight />
                 </Link>
               </Button>
