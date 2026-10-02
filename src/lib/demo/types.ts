@@ -35,6 +35,11 @@ export type SimulatedInvestment = {
   provider: string;
   route: string;
   status: "simulated";
+  // Optional only for pre-wallet demo history. Never used as proof of approval.
+  walletAddress?: string | undefined;
+  walletApproval?: "verified" | undefined;
+  network?: "solana:devnet" | undefined;
+  approvedAt?: string | undefined;
   createdAt: string;
 };
 
@@ -46,7 +51,6 @@ export type DemoState = {
   interpretation: string;
   exposures: Exposure[];
   assets: DemoAsset[];
-  walletConnected: boolean;
   investments: SimulatedInvestment[];
 };
 
@@ -60,6 +64,5 @@ export const emptyDemoState: DemoState = {
   interpretation: "",
   exposures: [],
   assets: [],
-  walletConnected: false,
   investments: [],
 };
