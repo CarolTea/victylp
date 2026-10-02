@@ -260,6 +260,38 @@ export function CompositionWorkspace({
     setResult(null);
     onClearApproval();
   };
+  const walletHelp = (
+    <div className="demo-disclaimer">
+      {!connected && (
+        <p>
+          No wallet yet?{" "}
+          <a
+            href="https://phantom.com/download"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Download Phantom
+          </a>{" "}
+          and set it up, then refresh this page to connect.
+        </p>
+      )}
+      <p>
+        In Phantom, open your profile → Settings → Developer Settings, enable Testnet Mode and
+        select Solana Devnet. This demo only asks you to sign a message. No SOL or deposit is
+        needed.{" "}
+        <a
+          href="https://help.phantom.com/articles/28951369255699"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Setup guide
+        </a>
+      </p>
+    </div>
+  );
+
   const walletChoices =
     !connected && wallet.wallets.length > 1 ? (
       <div className="demo-summary-list" aria-label="Choose a wallet">
@@ -404,6 +436,7 @@ export function CompositionWorkspace({
                     : "Connect wallet"}
             </Button>
             {walletChoices}
+            {walletHelp}
             {wallet.error && (
               <p className="demo-error" role="alert">
                 {wallet.error.message}
@@ -497,6 +530,7 @@ export function CompositionWorkspace({
                     Demo route — no real asset purchase will occur.
                   </div>
                   {walletChoices}
+                  {walletHelp}
                   {(wallet.error || approvalError) && (
                     <p className="demo-error" role="alert">
                       {wallet.error?.message ?? approvalError}
