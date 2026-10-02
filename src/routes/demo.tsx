@@ -99,7 +99,11 @@ function DemoPage() {
       setState(next);
       if (credentials) {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...credentials, state: next }));
-        void saveSession({ data: { ...credentials, state: next } });
+        void saveSession({ data: { ...credentials, state: next } }).catch(() => {
+          setError(
+            "Your progress is saved in this browser, but could not sync. Please try again before switching devices.",
+          );
+        });
       }
     },
     [credentials, saveSession],
@@ -366,12 +370,12 @@ function DemoPage() {
             window.localStorage.setItem("victy_pending_save", "1");
             void supabase.auth
               .getUser()
-              .then(
-                ({ data }) =>
-                  void navigate(
-                    data.user ? { to: "/dashboard" } : { to: "/auth", search: { next: "save" } },
-                  ),
-              );
+              .then(({ data }) =>
+                navigate(
+                  data.user ? { to: "/dashboard" } : { to: "/auth", search: { next: "save" } },
+                ),
+              )
+              .catch(() => setError("Could not open your thesis. Please try again."));
           }}
         />
       )}

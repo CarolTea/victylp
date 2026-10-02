@@ -38,15 +38,22 @@ function AssetCard({
   onChange,
   onToggle,
   onInvest,
+  investedAmount,
 }: {
   asset: DemoAsset;
   onChange: (value: number) => void;
   onToggle: () => void;
   onInvest: () => void;
+  investedAmount: number;
 }) {
   const [details, setDetails] = useState(false);
   return (
     <article className={`demo-asset-card ${asset.active ? "" : "is-rejected"}`}>
+      {investedAmount > 0 && (
+        <p className="demo-disclaimer" role="status">
+          Simulated investment: ${investedAmount.toLocaleString("en-US")}
+        </p>
+      )}
       <div className="demo-asset-top">
         <div className="demo-ticker">
           <span>{asset.ticker.slice(0, 2)}</span>
@@ -132,7 +139,7 @@ function AssetCard({
               disabled={Math.round((PORTFOLIO_VALUE * asset.allocation) / 100) <= 0}
               onClick={onInvest}
             >
-              Invest
+              {investedAmount > 0 ? "Simulate again" : "Invest"}
             </Button>
           </>
         ) : (
@@ -326,6 +333,9 @@ export function CompositionWorkspace({
               <AssetCard
                 key={asset.id}
                 asset={asset}
+                investedAmount={state.investments
+                  .filter((investment) => investment.assetId === asset.id)
+                  .reduce((total, investment) => total + investment.amount, 0)}
                 onChange={(allocation) => updateAsset(asset.id, { allocation })}
                 onToggle={() => updateAsset(asset.id, { active: !asset.active })}
                 onInvest={() => {
