@@ -360,6 +360,10 @@ export type Database = {
         Args: { challenge_id: string; session_id: string }
         Returns: boolean
       }
+      save_tracked_thesis_atomic: {
+        Args: { owner_id: string; payload: Json; session_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
