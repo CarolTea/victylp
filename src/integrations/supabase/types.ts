@@ -356,10 +356,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      save_tracked_thesis_atomic: {
-        Args: { owner_id: string; session_id: string; payload: Json };
-        Returns: string;
-      };
       consume_demo_wallet_approval: {
         Args: { challenge_id: string; session_id: string }
         Returns: boolean
