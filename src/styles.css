@@ -225,7 +225,7 @@ button { cursor: pointer; }
 .demo-exposure-stack article:last-child { border: 0; }
 .demo-exposure-stack article > span { color: var(--signal); font: 500 12px var(--font-mono); }
 .demo-exposure-stack strong { font-size: 17px; }
-.demo-exposure-stack p { margin-top: 5px; color: var(--muted-foreground); font-size: 13px; }
+.demo-exposure-stack p { margin-top: 5px; color: var(--muted-foreground); font-size: 15px; line-height: 1.7; }
 .demo-workspace { width: min(1440px, calc(100% - 48px)); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 28px; padding: 56px 0 100px; align-items: start; }
 .demo-section-heading h1 { font-size: clamp(42px, 5vw, 68px); }
 .demo-asset-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -242,7 +242,7 @@ button { cursor: pointer; }
 .demo-allocation span { color: var(--muted-foreground); }
 .demo-allocation strong { margin-left: auto; font: 600 30px var(--font-mono); }
 .demo-allocation small { color: var(--muted-foreground); font: 500 11px var(--font-mono); }
-.demo-exposure p, .demo-details p { margin-top: 5px; color: var(--muted-foreground); font-size: 13px; }
+.demo-exposure p, .demo-details p { margin-top: 5px; color: var(--muted-foreground); font-size: 14px; line-height: 1.7; }
 .demo-details-toggle { width: 100%; margin: 18px 0 8px; display: flex; justify-content: space-between; border: 0; background: transparent; color: var(--muted-foreground); font-size: 12px; }
 .demo-details-toggle svg { width: 15px; transition: transform .2s; }
 .demo-details { display: grid; gap: 13px; padding: 12px 0; }
@@ -270,8 +270,12 @@ button { cursor: pointer; }
 .demo-wallet-head { gap: 10px; }
 .demo-wallet-head > svg { width: 20px; color: var(--signal); }
 .demo-wallet-head div { display: grid; }
-.demo-wallet-head span { color: var(--muted-foreground); font-size: 10px; }
-.demo-disclaimer { margin-top: 18px; color: var(--muted-foreground); font-size: 10px; line-height: 1.5; }
+.demo-wallet-head span { color: var(--muted-foreground); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.demo-disclaimer { margin-top: 18px; color: var(--muted-foreground); font-size: 14px; font-weight: 400; line-height: 1.7; overflow-wrap: anywhere; }
+.demo-disclaimer p + p { margin-top: 12px; }
+.demo-section-heading > p:not(.eyebrow):not(.demo-disclaimer) { max-width: 75ch; margin-block: 16px; font-size: 16px; line-height: 1.75; }
+.demo-section-heading > .demo-disclaimer, .demo-interpret .demo-disclaimer { max-width: 75ch; }
+.demo-interpret-actions { margin-top: 24px; }
 .demo-review-dialog { max-width: 620px; border-color: var(--border); border-radius: 6px; }
 .demo-review-grid { margin: 10px 0; display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--border); }
 .demo-review-grid > div { padding: 18px; display: grid; gap: 7px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
