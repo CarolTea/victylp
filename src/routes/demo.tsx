@@ -18,6 +18,11 @@ import { emptyDemoState, type DemoSessionCredentials, type DemoState } from "@/l
 import { useDemoWallet } from "@/hooks/use-demo-wallet";
 import { issueWalletApproval, verifyWalletApproval } from "@/lib/wallet-approval.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { StrategyCard } from "@/components/strategies/strategy-card";
+import { StrategyPreviewDialog } from "@/components/strategies/strategy-preview-dialog";
+import { demoStrategies } from "@/lib/strategies/mock-strategies";
+import { usePublishedStrategies } from "@/lib/strategies/session-store";
+import type { PublicStrategy } from "@/lib/strategies/types";
 
 const STORAGE_KEY = "victy_demo_session_v1";
 const examples = [
@@ -75,6 +80,8 @@ function DemoPage() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState("");
+  const published = usePublishedStrategies();
+  const [preview, setPreview] = useState<PublicStrategy | null>(null);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [state.step]);
@@ -349,13 +356,28 @@ function DemoPage() {
           </div>
           <div className="demo-examples">
             <span>OR START WITH AN EXAMPLE</span>
+            <small className="mono-label">THESIS EXAMPLES</small>
             {examples.map((example) => (
               <button type="button" key={example} onClick={() => setDraft(example)}>
                 {example}
                 <ArrowRight />
               </button>
             ))}
+            <small className="mono-label demo-strategies-label">OR EXPLORE A PUBLIC STRATEGY</small>
+            <div className="strategy-grid">
+              {[...published, ...demoStrategies].map((strategy) => (
+                <StrategyCard key={strategy.id} strategy={strategy} onOpen={setPreview} />
+              ))}
+            </div>
           </div>
+          <StrategyPreviewDialog
+            strategy={preview}
+            onClose={() => setPreview(null)}
+            onUseAsInspiration={(strategy) => {
+              setDraft(`I believe ${strategy.thesisSummary.charAt(0).toLowerCase()}${strategy.thesisSummary.slice(1)}`);
+              setPreview(null);
+            }}
+          />
         </section>
       )}
       {state.step === "conversation" && (
