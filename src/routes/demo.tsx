@@ -12,7 +12,6 @@ import {
   createDemoSession,
   generateComposition,
   interpretThesis,
-  loadDemoSession,
   saveDemoSession,
 } from "@/lib/demo.functions";
 import { emptyDemoState, type DemoSessionCredentials, type DemoState } from "@/lib/demo/types";
@@ -58,10 +57,10 @@ function DemoPage() {
   const initialized = useRef(false);
   const resetLock = useRef(false);
   const trackLock = useRef(false);
+  const aiLock = useRef(false);
   const syncQueue = useRef(Promise.resolve());
   const [tracking, setTracking] = useState(false);
   const createSession = useServerFn(createDemoSession);
-  const loadSession = useServerFn(loadDemoSession);
   const saveSession = useServerFn(saveDemoSession);
   const clarify = useServerFn(clarifyThesis);
   const interpret = useServerFn(interpretThesis);
@@ -84,24 +83,16 @@ function DemoPage() {
     initialized.current = true;
     void (async () => {
       try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (raw && !fresh) {
-          const saved = JSON.parse(raw) as DemoSessionCredentials & { state?: DemoState };
-          const result = await loadSession({ data: saved });
-          if (result.ok) {
-            setCredentials({ id: saved.id, secret: saved.secret });
-            setState(saved.state ?? result.state);
-            setReady(true);
-            return;
-          }
-        }
         const created = await createSession();
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(created));
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ ...created, state: emptyDemoState }),
+        );
         setCredentials(created);
+        window.localStorage.removeItem("victy_pending_save");
+        window.localStorage.removeItem("victy_pending_user");
+        window.localStorage.removeItem("victy_pending_name");
         if (fresh) {
-          window.localStorage.removeItem("victy_pending_save");
-          window.localStorage.removeItem("victy_pending_user");
-          window.localStorage.removeItem("victy_pending_name");
           await navigate({ to: "/demo", search: {}, replace: true });
         }
       } catch {
@@ -110,7 +101,7 @@ function DemoPage() {
         setReady(true);
       }
     })();
-  }, [createSession, loadSession, fresh, navigate]);
+  }, [createSession, fresh, navigate]);
   const updateState = useCallback(
     (next: DemoState) => {
       setState(next);
@@ -130,66 +121,99 @@ function DemoPage() {
     },
     [credentials, saveSession],
   );
+  const explainError = (error: unknown) =>
+    setError(
+      error instanceof Error
+        ? error.message
+        : "VicTy could not complete this request. Please try again.",
+    );
   const begin = async (belief: string) => {
+    if (aiLock.current || !credentials) return;
     const clean = belief.trim();
     if (clean.length < 10) {
       setError("Describe your belief in a little more detail.");
       return;
     }
+    aiLock.current = true;
     setPending(true);
     setError("");
     try {
-      const result = await clarify({ data: { belief: clean, count: 0 } });
-      updateState({
+      const result = await clarify({
+        data: { credentials, belief: clean, count: 0, messages: [] },
+      });
+      const next = {
         ...state,
-        step: "conversation",
         belief: clean,
         messages: result.messages,
-        clarificationCount: 0,
-      });
-    } catch {
-      setError("VicTy could not start the demo. Please try again.");
+        clarificationCount: result.ready ? 0 : 1,
+      };
+      if (result.ready) {
+        const understood = await interpret({
+          data: { credentials, belief: clean, messages: result.messages },
+        });
+        updateState({ ...next, step: "interpretation", ...understood });
+      } else updateState({ ...next, step: "conversation" });
+    } catch (error) {
+      explainError(error);
     } finally {
+      aiLock.current = false;
       setPending(false);
     }
   };
   const reply = async (answer: string) => {
+    if (aiLock.current || !credentials) return;
+    aiLock.current = true;
     setPending(true);
-    const optimistic = [
-      ...state.messages,
-      { id: crypto.randomUUID(), role: "user" as const, text: answer },
-    ];
-    updateState({ ...state, messages: optimistic });
+    setError("");
     try {
       const result = await clarify({
-        data: { belief: state.belief, answer, count: state.clarificationCount },
+        data: {
+          credentials,
+          belief: state.belief,
+          answer,
+          count: state.clarificationCount,
+          messages: state.messages.slice(-8),
+        },
       });
-      const messages = [
-        ...optimistic,
-        ...result.messages.filter((message) => message.role === "assistant"),
-      ];
+      const messages = [...state.messages, ...result.messages];
       if (result.ready) {
-        const understood = await interpret({ data: { belief: state.belief, messages } });
-        updateState({
-          ...state,
-          step: "interpretation",
-          messages,
-          clarificationCount: state.clarificationCount + 1,
-          ...understood,
+        const understood = await interpret({
+          data: { credentials, belief: state.belief, messages: messages.slice(-8) },
         });
+        updateState({ ...state, step: "interpretation", messages, ...understood });
       } else updateState({ ...state, messages, clarificationCount: state.clarificationCount + 1 });
-    } catch {
-      setError("The response could not be processed. Please try again.");
+    } catch (error) {
+      explainError(error);
     } finally {
+      aiLock.current = false;
       setPending(false);
     }
   };
   const build = async () => {
+    if (aiLock.current || !credentials) return;
+    aiLock.current = true;
     setPending(true);
+    setError("");
     try {
-      const assets = await compose({ data: { exposures: state.exposures } });
-      updateState({ ...state, step: "composition", assets });
+      const result = await compose({
+        data: {
+          credentials,
+          belief: state.belief,
+          interpretation: {
+            summary: state.interpretation,
+            exposures: state.exposures.map((e) => ({
+              ...e,
+              importance: e.importance ?? "primary",
+            })),
+            limitations: state.limitations ?? [],
+          },
+        },
+      });
+      updateState({ ...state, step: "composition", ...result });
+    } catch (error) {
+      explainError(error);
     } finally {
+      aiLock.current = false;
       setPending(false);
     }
   };
@@ -267,14 +291,19 @@ function DemoPage() {
             </span>
           ))}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={pending || tracking || wallet.status === "signing"}
-          onClick={() => void reset()}
-        >
-          <RotateCcw /> Start over
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/dashboard">My strategies</Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={pending || tracking || wallet.status === "signing"}
+            onClick={() => void reset()}
+          >
+            <RotateCcw /> Start over
+          </Button>
+        </div>
       </header>
       {error && (
         <div className="demo-error" role="alert">
@@ -353,6 +382,11 @@ function DemoPage() {
               <span className="gradient-text">your thesis.</span>
             </h1>
             <blockquote>{state.interpretation}</blockquote>
+            {state.limitations?.map((limitation, index) => (
+              <p className="demo-disclaimer" key={index}>
+                {limitation}
+              </p>
+            ))}
             <div className="demo-interpret-actions">
               <Button size="lg" onClick={() => void build()} disabled={pending}>
                 {pending ? "Building…" : "Build a composition"}
@@ -384,7 +418,25 @@ function DemoPage() {
         <CompositionWorkspace
           state={state}
           onState={updateState}
-          onAsk={async (question) => ask({ data: { question, state } })}
+          onAsk={async (question) => {
+            if (!credentials) throw new Error("Demo session unavailable. Please refresh.");
+            return ask({
+              data: {
+                credentials,
+                question,
+                state: {
+                  belief: state.belief,
+                  interpretation: state.interpretation,
+                  exposures: state.exposures,
+                  assets: state.assets.map(({ id, allocation, active }) => ({
+                    id,
+                    allocation,
+                    active,
+                  })),
+                },
+              },
+            });
+          }}
           wallet={wallet}
           walletReady={Boolean(provider)}
           onConnect={async (walletId) => {

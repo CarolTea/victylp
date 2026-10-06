@@ -11,6 +11,7 @@ export type Exposure = {
   id: string;
   name: string;
   description: string;
+  importance?: "primary" | "secondary" | undefined;
 };
 
 export type DemoAsset = {
@@ -52,6 +53,9 @@ export type DemoState = {
   exposures: Exposure[];
   assets: DemoAsset[];
   investments: SimulatedInvestment[];
+  limitations?: string[] | undefined;
+  compositionSummary?: string | undefined;
+  catalogVersion?: string | undefined;
 };
 
 export type DemoSessionCredentials = { id: string; secret: string };

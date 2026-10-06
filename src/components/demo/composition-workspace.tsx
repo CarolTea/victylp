@@ -1,3 +1,4 @@
+import type { AnswerResult } from "@/lib/ai/schemas";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -172,7 +173,7 @@ export function CompositionWorkspace({
   onClearApproval: () => void;
   state: DemoState;
   onState: (state: DemoState) => void;
-  onAsk: (question: string) => Promise<string>;
+  onAsk: (question: string) => Promise<AnswerResult>;
   onSimulate: (asset: DemoAsset, amount: number) => Promise<SimulatedInvestment>;
   onTrack: () => void;
   tracking: boolean;
@@ -199,6 +200,14 @@ export function CompositionWorkspace({
   const [reviewStep, setReviewStep] = useState<"review" | "approval" | "success">("review");
   const [askMessages, setAskMessages] = useState<DemoMessage[]>([]);
   const [asking, setAsking] = useState(false);
+  const askLock = useRef(false);
+  const [askError, setAskError] = useState("");
+  const [proposal, setProposal] = useState<{ assets: DemoAsset[]; base: string } | null>(null);
+  const allocationKey = JSON.stringify(
+    state.assets.map(({ id, allocation, active }) => ({ id, allocation, active })),
+  );
+  const allocationRef = useRef(allocationKey);
+  allocationRef.current = allocationKey;
   const total = useMemo(
     () =>
       state.assets
@@ -214,19 +223,35 @@ export function CompositionWorkspace({
     });
   const ask = async (question: string) => {
     const clean = question.trim();
-    if (!clean || asking) return;
+    if (!clean || askLock.current) return;
+    askLock.current = true;
+    setAskError("");
+    setProposal(null);
+    const base = allocationKey;
     setAskMessages((current) => [
       ...current,
       { id: crypto.randomUUID(), role: "user", text: clean },
     ]);
     setAsking(true);
     try {
-      const text = await onAsk(clean);
+      const answer = await onAsk(clean);
+      const text = [answer.explanation, ...answer.limitations].join("\n\n");
+      if (answer.proposedAssets && allocationRef.current === base)
+        setProposal({ assets: answer.proposedAssets, base });
+      else if (answer.proposedAssets)
+        setAskError(
+          "The composition changed while VicTy was responding. Ask again to review an updated proposal.",
+        );
       setAskMessages((current) => [
         ...current,
         { id: crypto.randomUUID(), role: "assistant", text },
       ]);
+    } catch (error) {
+      setAskError(
+        error instanceof Error ? error.message : "VicTy could not answer. Please try again.",
+      );
     } finally {
+      askLock.current = false;
       setAsking(false);
     }
   };
@@ -286,6 +311,10 @@ export function CompositionWorkspace({
         </p>
       )}
       <p>
+        If you have already authorized VicTy in your wallet, connecting may not open a new approval
+        window. Signing the demo message is a separate step.
+      </p>
+      <p>
         In Phantom, open your profile → Settings → Developer Settings, enable Testnet Mode and
         select Solana Devnet. This demo only asks you to sign a message. No SOL or deposit is
         needed.{" "}
@@ -329,6 +358,12 @@ export function CompositionWorkspace({
               can be represented
             </h1>
             <p>This is a proposed composition for exploration. Nothing has been bought.</p>
+            {state.compositionSummary && <p>{state.compositionSummary}</p>}
+            {state.limitations?.map((limitation, index) => (
+              <p className="demo-disclaimer" key={index}>
+                {limitation}
+              </p>
+            ))}
           </div>
           <div className="demo-asset-grid">
             {state.assets.map((asset) => (
@@ -355,8 +390,8 @@ export function CompositionWorkspace({
             <h2>Ask VicTy about this composition</h2>
             <div className="demo-suggestions">
               {[
-                "Why is NVDA 35%?",
-                "What happens if I remove SOL?",
+                `Why is ${state.assets.find((a) => a.active)?.ticker ?? "this asset"} here?`,
+                "What are the main risks in this composition?",
                 "Make this less volatile.",
                 "Can this thesis be represented only with tokenized RWAs?",
               ].map((q) => (
@@ -381,6 +416,36 @@ export function CompositionWorkspace({
                 {asking && (
                   <Shimmer className="text-muted-foreground">Reviewing composition...</Shimmer>
                 )}
+              </div>
+            )}
+            {askError && (
+              <p className="demo-error" role="alert">
+                {askError}
+              </p>
+            )}
+            {proposal && (
+              <div className="demo-summary-list">
+                <p className="demo-disclaimer">Proposed changes — nothing has been applied.</p>
+                {proposal.assets.map((asset) => (
+                  <div key={asset.id}>
+                    <span>{asset.ticker}</span>
+                    <b>{asset.allocation}%</b>
+                  </div>
+                ))}
+                <Button
+                  disabled={proposal.base !== allocationKey || asking || approving || walletBusy}
+                  onClick={() => {
+                    if (proposal.base !== allocationKey) return;
+                    onClearApproval();
+                    onState({ ...state, assets: proposal.assets });
+                    setProposal(null);
+                  }}
+                >
+                  Apply proposal
+                </Button>
+                <Button variant="ghost" onClick={() => setProposal(null)}>
+                  Dismiss
+                </Button>
               </div>
             )}
             <PromptInput onSubmit={({ text }) => ask(text)}>
