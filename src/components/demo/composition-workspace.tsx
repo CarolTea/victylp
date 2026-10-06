@@ -311,6 +311,10 @@ export function CompositionWorkspace({
         </p>
       )}
       <p>
+        If you have already authorized VicTy in your wallet, connecting may not open a new approval
+        window. Signing the demo message is a separate step.
+      </p>
+      <p>
         In Phantom, open your profile → Settings → Developer Settings, enable Testnet Mode and
         select Solana Devnet. This demo only asks you to sign a message. No SOL or deposit is
         needed.{" "}

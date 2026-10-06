@@ -12,7 +12,6 @@ import {
   createDemoSession,
   generateComposition,
   interpretThesis,
-  loadDemoSession,
   saveDemoSession,
 } from "@/lib/demo.functions";
 import { emptyDemoState, type DemoSessionCredentials, type DemoState } from "@/lib/demo/types";
@@ -62,7 +61,6 @@ function DemoPage() {
   const syncQueue = useRef(Promise.resolve());
   const [tracking, setTracking] = useState(false);
   const createSession = useServerFn(createDemoSession);
-  const loadSession = useServerFn(loadDemoSession);
   const saveSession = useServerFn(saveDemoSession);
   const clarify = useServerFn(clarifyThesis);
   const interpret = useServerFn(interpretThesis);
@@ -85,24 +83,16 @@ function DemoPage() {
     initialized.current = true;
     void (async () => {
       try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (raw && !fresh) {
-          const saved = JSON.parse(raw) as DemoSessionCredentials & { state?: DemoState };
-          const result = await loadSession({ data: saved });
-          if (result.ok) {
-            setCredentials({ id: saved.id, secret: saved.secret });
-            setState(saved.state ?? result.state);
-            setReady(true);
-            return;
-          }
-        }
         const created = await createSession();
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(created));
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ ...created, state: emptyDemoState }),
+        );
         setCredentials(created);
+        window.localStorage.removeItem("victy_pending_save");
+        window.localStorage.removeItem("victy_pending_user");
+        window.localStorage.removeItem("victy_pending_name");
         if (fresh) {
-          window.localStorage.removeItem("victy_pending_save");
-          window.localStorage.removeItem("victy_pending_user");
-          window.localStorage.removeItem("victy_pending_name");
           await navigate({ to: "/demo", search: {}, replace: true });
         }
       } catch {
@@ -111,7 +101,7 @@ function DemoPage() {
         setReady(true);
       }
     })();
-  }, [createSession, loadSession, fresh, navigate]);
+  }, [createSession, fresh, navigate]);
   const updateState = useCallback(
     (next: DemoState) => {
       setState(next);
@@ -301,14 +291,19 @@ function DemoPage() {
             </span>
           ))}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={pending || tracking || wallet.status === "signing"}
-          onClick={() => void reset()}
-        >
-          <RotateCcw /> Start over
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/dashboard">My strategies</Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={pending || tracking || wallet.status === "signing"}
+            onClick={() => void reset()}
+          >
+            <RotateCcw /> Start over
+          </Button>
+        </div>
       </header>
       {error && (
         <div className="demo-error" role="alert">
