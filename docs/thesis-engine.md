@@ -88,3 +88,23 @@ Manual plan after configuring Lovable:
 6. Temporarily use an invalid API key/model in a nonproduction preview: expect a recoverable error, no mock fallback, no key in browser/network assets. Restore config and retry.
 7. Complete the existing wallet signature, save through email auth, reload dashboard/detail and verify snapshots remain persisted. Start a new demo, create a second thesis and verify both still exist. Solana, performance and execution remain the previous implementations.
 8. Confirm all displayed prices, performance, routes and execution are still labeled simulation. No trade or funds movement happens.
+
+### Economic scope gate
+
+Every production OpenAI operation runs a separate structured scope check before generation.
+Only `IN_SCOPE` proceeds; `OUT_OF_SCOPE` and `NEEDS_CLARIFICATION` return fixed redirects
+in Portuguese or English. Invalid, refused, incomplete or failed checks stop generation.
+The three-question clarification limit also runs the gate. Engine wrappers preserve scope
+redirects; the existing UI error handling leaves the current thesis and allocations intact.
+The development-only mock remains unchanged and does not exercise this production gate.
+
+The gate evaluates intent, including follow-up context, mixed requests and instruction
+injection. It must allow economic theses about sports and novel sectors even when the
+catalog cannot represent them. User text stays in request input, never in instructions.
+Each successful generation now needs one additional API request, adding cost and latency.
+A model-based gate is not a guarantee; evaluate it with the configured production model.
+
+Offline enforcement tests: `bun test tests/thesis-engine.test.ts tests/thesis-scope.test.ts`.
+Opt-in paid semantic evaluation: provide `OPENAI_API_KEY` in the environment, then run
+`bun tests/evaluate-scope.ts --live`. It reports case IDs and outcomes without printing keys
+or model responses. No database migration or new dependency is required.

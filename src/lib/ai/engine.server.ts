@@ -1,3 +1,4 @@
+import { ThesisScopeError } from "./scope";
 import type { AIProvider } from "../demo/providers";
 import { demoProviders } from "../demo/providers";
 import { CATALOG_VERSION } from "../assets/catalog";
@@ -60,7 +61,8 @@ export async function proposeThesis(
       await provider.proposeComposition({ belief, interpretation, candidates: candidates.assets }),
       candidates.assets,
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof ThesisScopeError) throw error;
     throw new Error("VicTy returned a composition that could not be validated. Please try again.");
   }
   return {
@@ -99,7 +101,8 @@ export async function answerThesis(
       limitations: answer.limitations,
       proposedAssets: answer.kind === "PROPOSED_CHANGE" ? proposalToAssets(answer) : null,
     };
-  } catch {
+  } catch (error) {
+    if (error instanceof ThesisScopeError) throw error;
     throw new Error(
       "VicTy could not validate this answer. No allocations were changed. Please try again.",
     );

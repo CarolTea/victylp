@@ -15,6 +15,8 @@ import {
 import { validateComposition, validateAnswer } from "./validation";
 import { PROMPT_VERSION, VICTY_THESIS_INSTRUCTIONS } from "./prompts/victy-thesis";
 
+import { enforceScope, scopeSchema, SCOPE_INSTRUCTIONS } from "./scope";
+
 export const DEFAULT_OPENAI_MODEL = "gpt-5.6-luna";
 export class OpenAIProvider implements AIProvider {
   private client: OpenAI;
@@ -35,10 +37,12 @@ export class OpenAIProvider implements AIProvider {
     data: unknown,
     maxTokens: number,
     validate?: (value: z.infer<T>) => z.infer<T>,
+    instructions = VICTY_THESIS_INSTRUCTIONS,
   ): Promise<z.infer<T>> {
     const input = JSON.stringify(data);
     if (input.length > 36_000)
       throw new Error("This request is too large. Please shorten your thesis or question.");
+    if (operation !== "scope_check") await this.checkScope(operation, data);
     const start = Date.now();
     let inputTokens = 0;
     let outputTokens = 0;
@@ -46,7 +50,7 @@ export class OpenAIProvider implements AIProvider {
     try {
       const response = await this.client.responses.parse({
         model: this.model,
-        instructions: `${VICTY_THESIS_INSTRUCTIONS}\nOperation: ${operation}. Prompt version: ${PROMPT_VERSION}.`,
+        instructions: `${instructions}\nOperation: ${operation}. Prompt version: ${PROMPT_VERSION}.`,
         input,
         store: false,
         reasoning: { effort: "low" },
@@ -83,14 +87,27 @@ export class OpenAIProvider implements AIProvider {
       });
     }
   }
+  private async checkScope(operation: string, data: unknown) {
+    const result = await this.request(
+      "scope_check",
+      scopeSchema,
+      { operation, data },
+      600,
+      undefined,
+      SCOPE_INSTRUCTIONS,
+    );
+    enforceScope(result);
+  }
   async clarify(belief: string, answer?: string, count = 0, messages: DemoMessage[] = []) {
-    if (count >= 3)
+    if (count >= 3) {
+      await this.checkScope("clarify", { belief, answer, conversation: messages });
       return {
         ready: true,
         question: null,
         options: [],
         reason: "Clarification limit reached; interpret with explicit limitations.",
       };
+    }
     const result = await this.request(
       "clarify",
       clarificationSchema,

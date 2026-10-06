@@ -194,7 +194,18 @@ function fakeClient(reply: unknown, requests: Record<string, unknown>[], httpSta
                     role: "assistant",
                     status: "completed",
                     content: [
-                      { type: "output_text", text: JSON.stringify(reply), annotations: [] },
+                      {
+                        type: "output_text",
+                        text: JSON.stringify(
+                          requests
+                            .at(-1)
+                            ?.instructions?.toString()
+                            .includes("Operation: scope_check.")
+                            ? { verdict: "IN_SCOPE", language: "en" }
+                            : reply,
+                        ),
+                        annotations: [],
+                      },
                     ],
                   },
                 ],
@@ -214,7 +225,7 @@ it("official SDK structured parsing uses bounded, server-only Responses requests
   );
   const result = await provider.clarify("I believe AI compute will grow");
   assert.equal(result.ready, true);
-  const request = requests[0]!;
+  const request = requests[1]!;
   assert.equal(request.model, "gpt-5.6-luna");
   assert.equal(request.store, false);
   assert.equal(request.max_output_tokens, 1000);
@@ -223,11 +234,12 @@ it("official SDK structured parsing uses bounded, server-only Responses requests
   assert.equal(format.type, "json_schema");
   assert.equal(format.strict, true);
 });
-it("clarification stops at three questions without another API request", async () => {
+it("clarification limit still checks scope without another generation", async () => {
   const requests: Record<string, unknown>[] = [];
   const provider = new OpenAIProvider(fakeClient({}, requests));
   assert.equal((await provider.clarify("A belief", undefined, 3)).ready, true);
-  assert.equal(requests.length, 0);
+  assert.equal(requests.length, 1);
+  assert.match(String(requests[0]!.instructions), /Operation: scope_check/);
 });
 it("Ask VicTy receives static trusted catalog fields and no browser-supplied identity, prices or secrets", async () => {
   const requests: Record<string, unknown>[] = [];
@@ -243,7 +255,7 @@ it("Ask VicTy receives static trusted catalog fields and no browser-supplied ide
     exposures: [],
     assets: [{ id: "ondo-nvda", allocation: 100, active: true }],
   });
-  const input = String(requests[0]!.input);
+  const input = String(requests[1]!.input);
   assert.ok(input.includes("NVIDIA"));
   for (const key of ["demoPrice", "price", "secret", "walletAddress", "investments"])
     assert.ok(!input.includes(`"${key}"`));
