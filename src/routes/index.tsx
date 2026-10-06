@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 import { joinEarlyAccess } from "@/lib/early-access.functions";
 import { supabase } from "@/integrations/supabase/client";
 import victyFrontAsset from "@/assets/victy-front-transparent.png.asset.json";
+import { StrategyCard } from "@/components/strategies/strategy-card";
+import { StrategyPreviewDialog } from "@/components/strategies/strategy-preview-dialog";
+import { demoStrategies } from "@/lib/strategies/mock-strategies";
+import type { PublicStrategy } from "@/lib/strategies/types";
 import victySunglassesAsset from "@/assets/victy-sunglasses-transparent.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -52,6 +56,7 @@ function Navigation() {
       <a href="#top" className="focus-ring rounded-md" aria-label="VicTy home"><VicTyLogo /></a>
       <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
         <button className="nav-link" onClick={() => navigate("how-it-works")}>How it works</button>
+        <button className="nav-link" onClick={() => navigate("strategies")}>Strategies</button>
         <button className="nav-link" onClick={() => navigate("why-victy")}>Why VicTy</button>
         <button className="nav-link" onClick={() => navigate("about")}>About</button>
         <Link to="/demo" className="nav-link">Try the demo</Link>
@@ -63,7 +68,7 @@ function Navigation() {
       </Button>
       {open && (
         <nav className="mobile-menu" aria-label="Mobile navigation">
-          {([["How it works", "how-it-works"], ["Why VicTy", "why-victy"], ["About", "about"]] as const).map(([label, id]) => (
+          {([["How it works", "how-it-works"], ["Strategies", "strategies"], ["Why VicTy", "why-victy"], ["About", "about"]] as const).map(([label, id]) => (
             <button key={id} onClick={() => navigate(id)}>{label}<ChevronRight className="size-4" /></button>
           ))}
           <Button asChild variant="ghost"><Link to="/demo">Try the demo <ArrowRight className="size-4" /></Link></Button>
@@ -104,17 +109,16 @@ function Hero() {
           <div className="eyebrow"><span className="signal-dot" /> BUILT ON SOLANA</div>
           <h1 className="hero-title">Invest in what<br /><span>you believe.</span></h1>
           <p className="hero-subtitle">Invest in a thesis, not a ticker.</p>
-          <p className="hero-copy">You see where the world is going.<br className="hidden sm:block" /> VicTy helps turn that conviction into an investment thesis you can understand.</p>
+          <p className="hero-copy">Turn any belief about the future into an explainable, investable onchain strategy.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ArrowLink onClick={() => scrollTo("waitlist")}>Join the waitlist</ArrowLink>
-            <Button asChild variant="secondary" size="lg">
+            <Button asChild size="lg">
               <Link to="/demo">
-                View demo
-                <ArrowRight
-                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
+                Build your thesis
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
               </Link>
+            </Button>
+            <Button type="button" variant="secondary" size="lg" onClick={() => scrollTo("strategies")}>
+              Explore strategies
             </Button>
           </div>
           <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><span className="size-1.5 rounded-full bg-signal" /> Non-custodial · You stay in control</p>
@@ -254,10 +258,36 @@ function Waitlist() {
   return <section id="waitlist" className="waitlist-section section-shell"><div className="page-width"><Reveal className={cn("waitlist-panel", status === "success" && "is-success")}><div className="waitlist-aurora" />{status === "success" ? <div className="success-layout" role="status"><div className="success-state"><span className="success-icon"><Check /></span><p className="eyebrow">EARLY ACCESS</p><h2>You’re on the list.</h2><p>We’ll let you know when VicTy is ready for you.</p></div><div className="success-victy-wrap" aria-hidden="true"><img src={victyFrontAsset.url} alt="" className="success-victy" /></div></div> : <div className="relative z-10 max-w-3xl"><p className="eyebrow">EARLY ACCESS</p><h2>What do you<br /><span className="gradient-text">believe in?</span></h2><p>We’re building a different way to turn conviction into investment decisions. Be among the first to experience VicTy.</p><form onSubmit={submit} noValidate><div className="signup-fields"><label><span>Full name</span><input type="text" autoComplete="name" maxLength={100} value={fields.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Your name" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>WhatsApp</span><input type="tel" inputMode="tel" autoComplete="tel" maxLength={24} value={fields.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="+55 11 99999 9999" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>Email address</span><input type="email" autoComplete="email" maxLength={254} value={fields.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" aria-invalid={Boolean(error)} aria-describedby="signup-help" disabled={status === "loading"} /></label><label className="signup-trap" aria-hidden="true"><span>Website</span><input tabIndex={-1} autoComplete="off" value={fields.website} onChange={(e) => updateField("website", e.target.value)} /></label><Button type="submit" size="lg" disabled={status === "loading"}>{status === "loading" ? "Joining…" : "Join the waitlist"}<ArrowRight className="size-4" /></Button></div><p id="signup-help" className={cn("form-note", error && "text-destructive")} role={error ? "alert" : undefined}>{error || "Your details stay private. No spam — only meaningful VicTy updates."}</p></form></div>}</Reveal></div></section>;
 }
 
+function BeliefToStrategy() {
+  const steps = ["What do you believe?", "VicTy maps the exposures", "Finds assets that represent them", "Builds an editable strategy", "You decide what to invest in"];
+  return <section id="belief-to-strategy" className="flow-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">FROM BELIEF TO STRATEGY</p><h2 className="section-title">One idea.<br /><span className="gradient-text">A strategy you control.</span></h2></Reveal><ol className="flow-steps">{steps.map((step, index) => <Reveal as-child="false" className="flow-step" delay={index * 90} key={step}><span>0{index + 1}</span><p>{step}</p></Reveal>)}</ol></div></section>;
+}
+
+function StrategyNetwork() {
+  const cards = [
+    ["Create", "Turn your thesis into a strategy."],
+    ["Publish", "Make it discoverable."],
+    ["Build a track record", "Performance becomes part of your history."],
+    ["Earn", "Creators may earn a share of VicTy execution revenue when others invest through their strategies."],
+  ];
+  return <section id="strategy-network" className="network-section section-shell"><div className="page-width"><Reveal className="max-w-3xl"><p className="eyebrow">STRATEGY NETWORK</p><h2 className="section-title">Your thesis doesn’t have to stay private.</h2><p className="section-copy">Publish your strategy, build a track record and let others follow how your ideas perform.</p></Reveal><div className="network-grid">{cards.map(([title, copy], index) => <Reveal className="network-card" delay={index * 80} key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></Reveal>)}</div><p className="form-note mt-6">Coming soon. Earnings are not guaranteed and depend on future program terms.</p></div></section>;
+}
+
+function ExploreStrategies() {
+  const [preview, setPreview] = useState<PublicStrategy | null>(null);
+  return <section id="strategies" className="strategies-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">EXPLORE STRATEGIES · EXAMPLES</p><h2 className="section-title">See how others<br /><span className="gradient-text">structure their beliefs.</span></h2><p className="section-copy">Example strategies from fictional creators. Performance and followers are simulated demo data.</p></Reveal><div className="strategy-grid mt-12">{demoStrategies.map((strategy) => <StrategyCard key={strategy.id} strategy={strategy} onOpen={setPreview} />)}</div></div><StrategyPreviewDialog strategy={preview} onClose={() => setPreview(null)} /></section>;
+}
+
+function BuiltAnywhere() {
+  const surfaces = ["VicTy App", "AI Agents", "Wallets", "Fintechs", "Creator Platforms"];
+  const stack = ["VicTy API", "Thesis Engine", "Strategies", "Execution"];
+  return <section id="infrastructure" className="anywhere-section section-shell"><div className="page-width anywhere-grid"><Reveal><p className="eyebrow">INFRASTRUCTURE</p><h2 className="section-title">Built to work anywhere.</h2><p className="section-copy">VicTy is not just an app. The same thesis intelligence can power wallets, AI agents, fintechs and creator platforms.</p></Reveal><Reveal className="anywhere-diagram" delay={120}><div className="anywhere-surfaces">{surfaces.map((s) => <span key={s}>{s}</span>)}</div>{stack.map((layer) => <div key={layer} className="anywhere-layer"><ArrowDown className="size-4" /><strong>{layer}</strong></div>)}</Reveal></div></section>;
+}
+
 function Footer() {
   return <footer className="site-footer"><div className="page-width"><div className="footer-main"><div><VicTyLogo /><p>Invest in what you believe.</p></div><nav aria-label="Footer navigation">{["Product", "Privacy", "Terms", "X", "LinkedIn"].map((link) => <span key={link}>{link}</span>)}</nav></div><div className="footer-bottom"><p>Built by women. Built on Solana.</p><p>VicTy doesn’t provide financial advice.</p><p>© 2026 VicTy</p></div></div></footer>;
 }
 
 function Index() {
-  return <main className="min-h-screen overflow-x-clip bg-background text-foreground"><Hero /><BeliefToStructure /><Composition /><ControlMoment /><HowItWorks /><WhyVicTy /><About /><Waitlist /><Footer /></main>;
+  return <main className="min-h-screen overflow-x-clip bg-background text-foreground"><Hero /><BeliefToStructure /><BeliefToStrategy /><Composition /><ControlMoment /><HowItWorks /><StrategyNetwork /><ExploreStrategies /><WhyVicTy /><BuiltAnywhere /><About /><Waitlist /><Footer /></main>;
 }
