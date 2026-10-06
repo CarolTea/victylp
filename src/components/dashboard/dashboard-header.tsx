@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { VicTyLogo } from "@/components/victy-logo";
 import { supabase } from "@/integrations/supabase/client";
+import { clearPublishedStrategies } from "@/lib/strategies/session-store";
 
 export function DashboardHeader() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export function DashboardHeader() {
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
+    clearPublishedStrategies();
     const { error } = await supabase.auth.signOut();
     if (error) return;
     window.localStorage.removeItem("victy_pending_save");

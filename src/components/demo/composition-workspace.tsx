@@ -28,6 +28,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { PublishStrategyPanel } from "@/components/strategies/publish-strategy-panel";
 import type { DemoAsset, DemoMessage, DemoState, SimulatedInvestment } from "@/lib/demo/types";
 
 import type { WalletSnapshot } from "@/lib/demo/wallet-types";
@@ -565,8 +566,9 @@ export function CompositionWorkspace({
                     <strong>Your wallet approval was verified.</strong>
                     <p>Save this composition to track its simulated performance.</p>
                   </div>
+                  <PublishStrategyPanel state={state} />
                   <Button onClick={onTrack} disabled={tracking}>
-                    {tracking ? "Opening your thesis…" : "View my thesis"} <ArrowRight />
+                    {tracking ? "Opening your thesis…" : "Save strategy & track"} <ArrowRight />
                   </Button>
                   <Button variant="ghost" onClick={close}>
                     Return to composition
