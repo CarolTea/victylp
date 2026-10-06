@@ -14,6 +14,7 @@ export const exposureSchema = z.object({
   id: z.string().max(80),
   name: z.string().max(100),
   description: z.string().max(300),
+  importance: z.enum(["primary", "secondary"]).optional(),
 });
 export const assetSchema = z.object({
   id: z.string().max(80),
@@ -51,4 +52,7 @@ export const stateSchema = z.object({
   exposures: z.array(exposureSchema).max(8),
   assets: z.array(assetSchema).max(12),
   investments: z.array(investmentSchema).max(30),
+  limitations: z.array(z.string().max(300)).max(16).optional(),
+  compositionSummary: z.string().max(1000).optional(),
+  catalogVersion: z.string().max(80).optional(),
 });
