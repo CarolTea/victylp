@@ -3,7 +3,7 @@ import { OpenAIProvider } from "../src/lib/ai/openai.server";
 import { proposeThesis } from "../src/lib/ai/engine.server";
 import { thesisCases } from "./fixtures/thesis-cases";
 if (!process.argv.includes("--live") || !process.env.OPENAI_API_KEY)
-  throw new Error("Set OPENAI_API_KEY and pass --live to run the nine evaluation cases.");
+  throw new Error("Set OPENAI_API_KEY and pass --live to run the evaluation cases.");
 const provider = new OpenAIProvider();
 let failures = 0;
 for (const fixture of thesisCases) {

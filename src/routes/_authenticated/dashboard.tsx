@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Plus } from "lucide-react";
@@ -29,8 +29,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DashboardPage,
+  component: DashboardRoute,
 });
+
+function DashboardRoute() {
+  const isIndex = useRouterState({
+    select: (state) => state.matches.at(-1)?.routeId === Route.id,
+  });
+  return isIndex ? <DashboardPage /> : <Outlet />;
+}
 
 function DashboardPage() {
   const list = useServerFn(listMyTheses);

@@ -107,7 +107,15 @@ function Hero() {
           <p className="hero-copy">You see where the world is going.<br className="hidden sm:block" /> VicTy helps turn that conviction into an investment thesis you can understand.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <ArrowLink onClick={() => scrollTo("waitlist")}>Join the waitlist</ArrowLink>
-            <ArrowLink variant="secondary" onClick={() => scrollTo("belief")}>See how it works</ArrowLink>
+            <Button asChild variant="secondary" size="lg">
+              <Link to="/demo">
+                View demo
+                <ArrowRight
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Link>
+            </Button>
           </div>
           <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><span className="size-1.5 rounded-full bg-signal" /> Non-custodial · You stay in control</p>
         </div>

@@ -1,10 +1,10 @@
-# VicTy Thesis Engine v1
+# VicTy Thesis Engine — catalog v2
 
 ## Architecture
 
 Existing UI → TanStack server function → verified demo session → AIProvider → OpenAIProvider → Responses API. `AIProvider` exposes clarify, interpret, proposeComposition and answer. Production defaults to OpenAI. Explicit `AI_PROVIDER=mock` is accepted only when `NODE_ENV=development`; configuration/API failures never silently substitute fixtures.
 
-Catalog version: `2026-10-02.v1`. Prompt version: `victy-thesis-v1`. SDK: official `openai@7.25.0` pinned in package.json and bun.lock. Version 7.27.0 was rejected by the project's minimum-release-age policy; that policy was preserved. Model defaults to `gpt-5.6-luna` and can be set with OPENAI_MODEL.
+Catalog version: `2026-10-06.v2`. Prompt version: `victy-thesis-v4`. SDK: official `openai@7.25.0` pinned in package.json and bun.lock. Version 7.27.0 was rejected by the project's minimum-release-age policy; that policy was preserved. Model defaults to `gpt-5.6-luna` and can be set with OPENAI_MODEL.
 
 Flow:
 1. Clarify a material ambiguity, ideally 1–2 questions, at most 3. Complete history up to 8 messages is included; a ready initial answer skips questions.
@@ -15,17 +15,19 @@ Flow:
 6. Hydrate all asset identity, price fixture, availability and instrument category from the catalog. Display using existing cards; no auto-investment or wallet operation.
 7. Ask VicTy uses relevant economic context and static catalog fields only. Explanation-only output cannot carry changes. A proposed change describes all existing positions, leaves rejected assets at zero, and is previewed until Apply proposal is clicked. Changed allocations invalidate a stale pending proposal; the server never mutates a portfolio from a model answer.
 
-## Catalog (30 instruments)
+## Catalog (35 instruments)
 
 All entries are enabled for simulation, chain=`solana` as the intended VicTy universe, executionStatus=`demo-only`. This does not assert verified live deployment or trading availability for each token. Identity metadata is curated manually; individual chain deployment, issuer/eligibility and execution availability must be verified before future real integrations. No addresses, scraping jobs, external asset API or live quote feed are included.
 
 | Category | Entries |
 | --- | --- |
-| Tokenized equity (17), Ondo | NVDAon, AMDon, AVGOon, TSMon, MSFTon, AAPLon, GOOGLon, AMZNon, METAon, VRTon, NEEon, CEGon, XOMon, Von, MAon, PYPLon, CRCLon |
+| Tokenized equity (18), Ondo | NVDAon, AMDon, AVGOon, TSMon, MSFTon, AAPLon, GOOGLon, AMZNon, METAon, VRTon, NEEon, CEGon, XOMon, Von, MAon, PYPLon, CRCLon, PBRon |
 | Tokenized ETF (8), Ondo | SPYon, QQQon, SMHon, XLUon, XLEon, GLDon, TLTon, SGOVon |
+| Tokenized ETF (1), Backpack | EWZ |
 | Digital asset (1), Solana | SOL |
-| Stablecoin (2) | USDC (Circle), PYUSD (Paxos / PayPal brand) |
+| Stablecoin (3) | USDC (Circle), PYUSD (Paxos / PayPal brand), BRZ (Transfero) |
 | Tokenized fixed income (2), Ondo | USDY, OUSG |
+| Tokenized fixed income (2), Etherfuse | TESOURO (BRL), CETES (MXN) |
 
 The type system also supports tokenized_commodity; GLD is classified as a tokenized ETF, not direct physical gold. Themes/exposures cover AI, chips, cloud, power generation, data-center power/cooling, US equity, Nasdaq, gold, Treasuries, payments, stablecoins, blockchain settlement, Solana and tokenized instruments. RWA adoption is not equated with a claim on an issuer's business profits. Stablecoins are not equity, and tokenized shares are not direct stock ownership.
 
@@ -77,10 +79,10 @@ Official OpenAI references:
 
 Offline: `bun test tests/` exercises the official SDK with a controlled HTTP transport (not a live model), schemas, catalog selection, injection-like IDs, allocation failures, proposal non-mutation, missing output, retry limit and privacy of inputs. Nine scenarios live in tests/fixtures/thesis-cases.ts. Two full engine fixtures demonstrate distinct compute/electricity portfolios.
 
-Optional paid evaluation, explicit opt-in only: `bun tests/evaluate-thesis.ts --live`, with a server OPENAI_API_KEY. It runs the nine fixed cases sequentially and reports case ID, selected IDs, allocation total and limitation count, not raw user text. A human should review output quality and risk explanations; static fixtures alone cannot establish live model quality.
+Optional paid evaluation, explicit opt-in only: `bun tests/evaluate-thesis.ts --live`, with a server OPENAI_API_KEY. It runs the sixteen fixed cases sequentially and reports case ID, selected IDs, allocation total and limitation count, not raw user text. A human should review output quality and risk explanations; static fixtures alone cannot establish live model quality.
 
 Manual plan after configuring Lovable:
-1. Run each of the nine fixture beliefs: AI infrastructure, AI electricity, RWA adoption, stablecoin payments, gold, Solana, profit maximization, unsupported lunar hotels, and instruction injection. Confirm clarification is material and never exceeds three questions.
+1. Run the original nine fixture beliefs: AI infrastructure, AI electricity, RWA adoption, stablecoin payments, gold, Solana, profit maximization, unsupported lunar hotels, and instruction injection. Confirm clarification is material and never exceeds three questions.
 2. Compare compute vs electricity: semiconductor/cloud representation versus power/utilities representation, with explanations and no identical fixed five-asset portfolio.
 3. For unsupported/profit/injection cases, check limitations or a clarification rather than fabricated stocks or promised returns. No unsupported asset may appear.
 4. Ask “Why is NVDA here?”: explanation only. Ask “Make this less volatile”: visible target allocations; nothing changes before Apply proposal. Dismiss leaves state unchanged. Edit an allocation while a request is pending: its stale proposal must not apply.
@@ -108,3 +110,52 @@ Offline enforcement tests: `bun test tests/thesis-engine.test.ts tests/thesis-sc
 Opt-in paid semantic evaluation: provide `OPENAI_API_KEY` in the environment, then run
 `bun tests/evaluate-scope.ts --live`. It reports case IDs and outcomes without printing keys
 or model responses. No database migration or new dependency is required.
+
+
+## Regional catalog v2 (2026-10-06.v2)
+
+The original 30 instruments and their existing metadata/fixture prices are retained.
+Five curated Solana representations are added: PBRon, EWZ, TESOURO, BRZ and CETES.
+MercadoLibre is not part of this version. These sources were checked on 2026-10-06:
+
+- PBRon: https://app.ondo.finance/assets/PBRon — the official page's embedded asset metadata includes a SOLANA deployment. No address is copied into application logic.
+- EWZ: https://learn.backpack.exchange/blog/tokenized-ishares-msci-brazil-etf-ewz — official Backpack announcement of Brazilian large/mid-cap exposure on Solana.
+- TESOURO: https://etherfuse.com/markets/brazil — BRL sovereign bonds; lists Solana.
+- BRZ: https://transfero.com/brz-stablecoin — official Solana deployment; BRL liquidity, not corporate growth or interest-bearing bonds.
+- CETES: https://etherfuse.com/markets/mexico — MXN sovereign certificates; lists Solana.
+
+`region` is required; `countryExposure`, `currencyExposure`, `marketExposure` and
+`availabilityScope` are optional, and are included in the model's candidate metadata.
+Legacy US securities use their primary reference market, not a claim that all revenue is
+US-derived. TSM is marked global with Taiwan exposure; SMH, gold and digital instruments
+use global where appropriate. Empty country/currency arrays do not claim zero exposure;
+they avoid fabricating a full country or currency breakdown. Legacy availability stays
+`demo`; the five additions are `provider-specific`. All execution stays `demo-only`.
+The five additions reuse the existing nominal `demoPrice: 100` simulation convention.
+This is not a market price, FX conversion, BRL/MXN peg value or yield, and is never sent
+to the model. No live APY, maturity, liquidity, price feed or token address was added.
+
+Matching operates on semantic exposure IDs, not raw belief keyword searches. The model
+identifies exposures; explicit aliases normalize regional concepts. Country themes never
+make all instruments in a country interchangeable. Brazil equities can nominate EWZ and
+PBRon, with EWZ ranked as the broad representation and PBRon's single-company limitation
+explicit. Local-rate exposure nominates TESOURO/CETES; BRL cash nominates BRZ. Economic
+drivers such as falling rates do not automatically require bond allocations in an equity
+thesis. Every proposed asset still needs a reason and must pass the existing catalog and
+candidate allowlists.
+
+Unsupported LatAm ecommerce/fintech, small caps, Mexican equities and MXN cash remain
+explicit limitations. TESOURO is now a supported Brazilian fixed-income representation.
+Brazil-specific AI/data-center IDs may use global thematic proxies, with an explicit
+lack-of-direct-Brazil-exposure limitation. No broad region-prefix removal is used.
+Existing handling is preserved: a missing primary exposure prevents a complete portfolio;
+a missing secondary exposure remains in limitations. Catalog candidates are eligibility,
+not a requirement to allocate to every candidate.
+
+Regional fixtures A–G cover Brazil stocks/rates, Petrobras/oil exports, high Selic, BRL
+liquidity, Mexican rates, unsupported LatAm ecommerce and Brazil data centers. Offline
+fixtures test deterministic mapping from intended semantic IDs; they do not establish
+live model interpretation quality. The optional paid evaluator includes these beliefs.
+The hero's secondary CTA now reads `View demo` and links to `/demo` using the existing
+button design. Wallet, auth, dashboard, persistence, OpenAI provider implementation and
+simulated execution are unchanged.

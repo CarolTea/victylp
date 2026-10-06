@@ -5,6 +5,7 @@ export type InstrumentType =
   | "stablecoin"
   | "tokenized_commodity"
   | "tokenized_fixed_income";
+export type AssetRegion = "us" | "brazil" | "latam" | "global";
 export type CatalogAsset = {
   id: string;
   ticker: string;
@@ -13,6 +14,11 @@ export type CatalogAsset = {
   instrumentType: InstrumentType;
   provider: string;
   chain: "solana";
+  region: AssetRegion;
+  countryExposure?: readonly string[];
+  currencyExposure?: readonly string[];
+  marketExposure?: readonly string[];
+  availabilityScope?: "demo" | "provider-specific";
   themes: readonly string[];
   exposures: readonly string[];
   riskTags: readonly string[];

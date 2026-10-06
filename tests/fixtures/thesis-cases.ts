@@ -1,4 +1,4 @@
-export const thesisCases = [
+const originalThesisCases = [
   {
     id: "ai-compute",
     belief: "I believe AI infrastructure will keep growing.",
@@ -64,3 +64,70 @@ export const thesisCases = [
     representable: false,
   },
 ] as const;
+
+export const regionalThesisCases = [
+  {
+    id: "brazil-stocks-rates",
+    belief: "I believe Brazil's stock market will benefit from lower interest rates.",
+    tags: ["brazil-equities", "brazil-interest-rates"],
+    expected: ["backpack-ewz", "etherfuse-tesouro"],
+    excluded: ["transfero-brz", "etherfuse-cetes"],
+    representable: true,
+  },
+  {
+    id: "petrobras-exports",
+    belief: "I believe Petrobras will benefit from higher global oil prices and stronger exports.",
+    tags: ["oil-and-gas", "brazil-energy", "commodity-exporters"],
+    expected: ["ondo-pbr"],
+    excluded: ["transfero-brz", "etherfuse-tesouro", "etherfuse-cetes", "backpack-ewz"],
+    representable: true,
+  },
+  {
+    id: "brazil-high-rates",
+    belief: "I believe Brazilian interest rates will stay high.",
+    tags: ["brazil-interest-rates", "brazil-local-fixed-income"],
+    expected: ["etherfuse-tesouro"],
+    excluded: ["transfero-brz", "ondo-pbr", "backpack-ewz", "etherfuse-cetes"],
+    representable: true,
+  },
+  {
+    id: "brl-liquidity",
+    belief: "I want exposure to the Brazilian real, not Brazilian stocks.",
+    tags: ["brazilian-real", "brl-liquidity"],
+    expected: ["transfero-brz"],
+    excluded: ["backpack-ewz", "ondo-pbr", "etherfuse-tesouro", "etherfuse-cetes"],
+    representable: true,
+  },
+  {
+    id: "mexico-rates",
+    belief: "I believe Mexican interest rates will remain attractive.",
+    tags: ["mexico-interest-rates", "mexico-local-fixed-income"],
+    expected: ["etherfuse-cetes"],
+    excluded: ["backpack-ewz", "ondo-pbr", "transfero-brz", "etherfuse-tesouro"],
+    representable: true,
+  },
+  {
+    id: "latam-ecommerce",
+    belief: "I believe Latin American ecommerce will grow strongly.",
+    tags: ["latam-ecommerce", "latam-fintech", "emerging-market-consumption"],
+    expected: [],
+    excluded: [
+      "ondo-meli",
+      "backpack-ewz",
+      "ondo-pbr",
+      "transfero-brz",
+      "etherfuse-tesouro",
+      "etherfuse-cetes",
+    ],
+    representable: false,
+  },
+  {
+    id: "brazil-data-centers",
+    belief: "I believe Brazil will benefit from AI data centers.",
+    tags: ["brazil-data-centers"],
+    expected: ["ondo-nvda", "ondo-amd", "ondo-vrt"],
+    excluded: ["backpack-ewz", "ondo-pbr", "transfero-brz", "etherfuse-tesouro", "etherfuse-cetes"],
+    representable: true,
+  },
+] as const;
+export const thesisCases = [...originalThesisCases, ...regionalThesisCases] as const;

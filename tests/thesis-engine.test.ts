@@ -31,9 +31,9 @@ const proposal = (assets = [item()], limitations = ["Limited representation."]) 
   assets,
   limitations,
 });
-it("catalog has 30 unique, typed, manually enabled simulation instruments", () => {
-  assert.equal(ASSET_CATALOG.length, 30);
-  assert.equal(new Set(ASSET_CATALOG.map((a) => a.id)).size, 30);
+it("catalog has 35 unique, typed, manually enabled simulation instruments", () => {
+  assert.equal(ASSET_CATALOG.length, 35);
+  assert.equal(new Set(ASSET_CATALOG.map((a) => a.id)).size, 35);
   for (const asset of ASSET_CATALOG) {
     assert.equal(asset.executionStatus, "demo-only");
     assert.ok(asset.themes.length && asset.exposures.length && asset.riskTags.length);
