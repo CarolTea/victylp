@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { VicTyLogo } from "@/components/victy-logo";
+import victyFrontAsset from "@/assets/victy-front-transparent.png.asset.json";
 import { DemoChat } from "@/components/demo/demo-chat";
 import { CompositionWorkspace } from "@/components/demo/composition-workspace";
 import {
@@ -328,10 +329,21 @@ function DemoPage() {
               <br />
               <span className="gradient-text">believe in?</span>
             </h1>
-            <p>
-              Describe a belief about the future. VicTy will help translate it into an investment
-              thesis you can understand and explore.
-            </p>
+            <div className="demo-intro-welcome">
+              <img
+                src={victyFrontAsset.url}
+                alt="VicTy mascot wearing sunglasses with her arms crossed"
+                width={1024}
+                height={1024}
+                loading="lazy"
+                decoding="async"
+                className="demo-intro-mascot"
+              />
+              <p>
+                Describe a belief about the future. VicTy will help translate it into an investment
+                thesis you can understand and explore.
+              </p>
+            </div>
           </div>
           <div className="demo-belief-entry">
             <label htmlFor="belief">YOUR BELIEF</label>

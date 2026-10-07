@@ -423,3 +423,12 @@ button { cursor: pointer; }
   .strategy-stats { grid-template-columns: minmax(0, 1fr); }
   .strategy-preview-actions > .button, .publish-actions > .button { width: 100%; }
 }
+
+/* Welcome mascot: scoped to the demo's first step. */
+.demo-intro-welcome { display: grid; grid-template-columns: 148px minmax(0, 1fr); align-items: center; gap: 18px; max-width: 500px; }
+.demo-intro-mascot { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.demo-intro-welcome p { margin: 0; color: var(--muted-foreground); font-size: 17px; line-height: 1.7; }
+@media (max-width: 640px) {
+  .demo-intro-welcome { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; }
+  .demo-intro-welcome p { font-size: 15px; }
+}
