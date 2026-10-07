@@ -1,3 +1,4 @@
+import { thesisLanguage } from "./language";
 import { ThesisScopeError } from "./scope";
 import type { AIProvider } from "../demo/providers";
 import { demoProviders } from "../demo/providers";
@@ -43,15 +44,20 @@ export async function proposeThesis(
   interpreted: Interpretation,
 ) {
   const interpretation = interpretationSchema.parse(interpreted);
-  const candidates = demoProviders.assets.getCandidates(interpretation.exposures);
+  const language = thesisLanguage(belief);
+  const candidates = demoProviders.assets.getCandidates(interpretation.exposures, language);
   if (!interpretation.exposures.length || candidates.missingPrimary || !candidates.assets.length)
     return {
       assets: [],
-      compositionSummary: "This thesis cannot be adequately represented by the approved catalog.",
+      compositionSummary:
+        language === "pt"
+          ? "Esta tese não pode ser representada adequadamente pelo catálogo aprovado."
+          : "This thesis cannot be adequately represented by the approved catalog.",
       limitations: [
-        ...interpretation.limitations,
         ...candidates.limitations,
-        "No complete portfolio was proposed. Refine the thesis or wait for broader catalog coverage.",
+        language === "pt"
+          ? "Nenhuma carteira completa foi proposta. Refine a tese ou aguarde uma cobertura mais ampla do catálogo."
+          : "No complete portfolio was proposed. Refine the thesis or wait for broader catalog coverage.",
       ].slice(0, 16),
       catalogVersion: CATALOG_VERSION,
     };
@@ -68,11 +74,9 @@ export async function proposeThesis(
   return {
     assets: proposalToAssets(proposal),
     compositionSummary: proposal.summary,
-    limitations: [
-      ...interpretation.limitations,
-      ...candidates.limitations,
-      ...proposal.limitations,
-    ].slice(0, 16),
+    // The composition phase re-evaluates thesis risks with actual candidates.
+    // Do not append stale pre-catalog conclusions to the validated proposal.
+    limitations: [...new Set([...candidates.limitations, ...proposal.limitations])].slice(0, 16),
     catalogVersion: CATALOG_VERSION,
   };
 }

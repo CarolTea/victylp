@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowDown, ArrowRight, Check, ChevronRight, Menu, Minus, RotateCcw, X } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { VicTyLogo } from "@/components/victy-logo";
@@ -10,7 +10,11 @@ import { joinEarlyAccess } from "@/lib/early-access.functions";
 import { supabase } from "@/integrations/supabase/client";
 import victyFrontAsset from "@/assets/victy-front-transparent.png.asset.json";
 import { StrategyCard } from "@/components/strategies/strategy-card";
-import { StrategyPreviewDialog } from "@/components/strategies/strategy-preview-dialog";
+const StrategyPreviewDialog = lazy(() =>
+  import("@/components/strategies/strategy-preview-dialog").then((module) => ({
+    default: module.StrategyPreviewDialog,
+  })),
+);
 import { demoStrategies } from "@/lib/strategies/mock-strategies";
 import type { PublicStrategy } from "@/lib/strategies/types";
 import victySunglassesAsset from "@/assets/victy-sunglasses-transparent.png.asset.json";
@@ -224,7 +228,7 @@ function WhyVicTy() {
 }
 
 function About() {
-  return <section id="about" className="about-section section-shell"><div className="page-width about-grid"><Reveal><p className="eyebrow">BUILT DIFFERENTLY</p><h2 className="section-title">Built by women.<br /><span className="gradient-text">Built for independent decisions.</span></h2></Reveal><Reveal delay={100}><p className="about-copy">VicTy is built by an all-women team creating technology for clearer, more autonomous investment decisions.</p></Reveal><Reveal className="about-victy-wrap" delay={180}><img src={victySunglassesAsset.url} alt="VicTy wearing sunglasses and celebrating with confidence" className="about-victy" /></Reveal></div></section>;
+  return <section id="about" className="about-section section-shell"><div className="page-width about-grid"><Reveal><p className="eyebrow">BUILT DIFFERENTLY</p><h2 className="section-title">Built by women.<br /><span className="gradient-text">Built for independent decisions.</span></h2></Reveal><Reveal delay={100}><p className="about-copy">VicTy is built by an all-women team creating technology for clearer, more autonomous investment decisions.</p></Reveal><Reveal className="about-victy-wrap" delay={180}><img src={victySunglassesAsset.url} loading="lazy" decoding="async" alt="VicTy wearing sunglasses and celebrating with confidence" className="about-victy" /></Reveal></div></section>;
 }
 
 function Waitlist() {
@@ -255,7 +259,7 @@ function Waitlist() {
       setError("We couldn’t save your details. Please try again.");
     }
   };
-  return <section id="waitlist" className="waitlist-section section-shell"><div className="page-width"><Reveal className={cn("waitlist-panel", status === "success" && "is-success")}><div className="waitlist-aurora" />{status === "success" ? <div className="success-layout" role="status"><div className="success-state"><span className="success-icon"><Check /></span><p className="eyebrow">EARLY ACCESS</p><h2>You’re on the list.</h2><p>We’ll let you know when VicTy is ready for you.</p></div><div className="success-victy-wrap" aria-hidden="true"><img src={victyFrontAsset.url} alt="" className="success-victy" /></div></div> : <div className="relative z-10 max-w-3xl"><p className="eyebrow">EARLY ACCESS</p><h2>What do you<br /><span className="gradient-text">believe in?</span></h2><p>We’re building a different way to turn conviction into investment decisions. Be among the first to experience VicTy.</p><form onSubmit={submit} noValidate><div className="signup-fields"><label><span>Full name</span><input type="text" autoComplete="name" maxLength={100} value={fields.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Your name" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>WhatsApp</span><input type="tel" inputMode="tel" autoComplete="tel" maxLength={24} value={fields.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="+55 11 99999 9999" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>Email address</span><input type="email" autoComplete="email" maxLength={254} value={fields.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" aria-invalid={Boolean(error)} aria-describedby="signup-help" disabled={status === "loading"} /></label><label className="signup-trap" aria-hidden="true"><span>Website</span><input tabIndex={-1} autoComplete="off" value={fields.website} onChange={(e) => updateField("website", e.target.value)} /></label><Button type="submit" size="lg" disabled={status === "loading"}>{status === "loading" ? "Joining…" : "Join the waitlist"}<ArrowRight className="size-4" /></Button></div><p id="signup-help" className={cn("form-note", error && "text-destructive")} role={error ? "alert" : undefined}>{error || "Your details stay private. No spam — only meaningful VicTy updates."}</p></form></div>}</Reveal></div></section>;
+  return <section id="waitlist" className="waitlist-section section-shell"><div className="page-width"><Reveal className={cn("waitlist-panel", status === "success" && "is-success")}><div className="waitlist-aurora" />{status === "success" ? <div className="success-layout" role="status"><div className="success-state"><span className="success-icon"><Check /></span><p className="eyebrow">EARLY ACCESS</p><h2>You’re on the list.</h2><p>We’ll let you know when VicTy is ready for you.</p></div><div className="success-victy-wrap" aria-hidden="true"><img src={victyFrontAsset.url} loading="lazy" decoding="async" alt="" className="success-victy" /></div></div> : <div className="relative z-10 max-w-3xl"><p className="eyebrow">EARLY ACCESS</p><h2>What do you<br /><span className="gradient-text">believe in?</span></h2><p>We’re building a different way to turn conviction into investment decisions. Be among the first to experience VicTy.</p><form onSubmit={submit} noValidate><div className="signup-fields"><label><span>Full name</span><input type="text" autoComplete="name" maxLength={100} value={fields.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Your name" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>WhatsApp</span><input type="tel" inputMode="tel" autoComplete="tel" maxLength={24} value={fields.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="+55 11 99999 9999" aria-invalid={Boolean(error)} disabled={status === "loading"} /></label><label><span>Email address</span><input type="email" autoComplete="email" maxLength={254} value={fields.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" aria-invalid={Boolean(error)} aria-describedby="signup-help" disabled={status === "loading"} /></label><label className="signup-trap" aria-hidden="true"><span>Website</span><input tabIndex={-1} autoComplete="off" value={fields.website} onChange={(e) => updateField("website", e.target.value)} /></label><Button type="submit" size="lg" disabled={status === "loading"}>{status === "loading" ? "Joining…" : "Join the waitlist"}<ArrowRight className="size-4" /></Button></div><p id="signup-help" className={cn("form-note", error && "text-destructive")} role={error ? "alert" : undefined}>{error || "Your details stay private. No spam — only meaningful VicTy updates."}</p></form></div>}</Reveal></div></section>;
 }
 
 function BeliefToStrategy() {
@@ -275,7 +279,7 @@ function StrategyNetwork() {
 
 function ExploreStrategies() {
   const [preview, setPreview] = useState<PublicStrategy | null>(null);
-  return <section id="strategies" className="strategies-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">EXPLORE STRATEGIES · EXAMPLES</p><h2 className="section-title">See how others<br /><span className="gradient-text">structure their beliefs.</span></h2><p className="section-copy">Example strategies from fictional creators. Performance and followers are simulated demo data.</p></Reveal><div className="strategy-grid mt-12">{demoStrategies.map((strategy) => <StrategyCard key={strategy.id} strategy={strategy} onOpen={setPreview} />)}</div></div><StrategyPreviewDialog strategy={preview} onClose={() => setPreview(null)} /></section>;
+  return <section id="strategies" className="strategies-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">EXPLORE STRATEGIES · EXAMPLES</p><h2 className="section-title">See how others<br /><span className="gradient-text">structure their beliefs.</span></h2><p className="section-copy">Example strategies from fictional creators. Performance and followers are simulated demo data.</p></Reveal><div className="strategy-grid mt-12">{demoStrategies.map((strategy) => <StrategyCard key={strategy.id} strategy={strategy} onOpen={setPreview} />)}</div></div>{preview && <Suspense fallback={<p role="status">Loading strategy…</p>}><StrategyPreviewDialog strategy={preview} onClose={() => setPreview(null)} /></Suspense>}</section>;
 }
 
 function BuiltAnywhere() {

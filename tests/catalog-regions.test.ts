@@ -222,3 +222,23 @@ it("invented LatAm instruments fail existing allocation validation", () => {
     );
   }
 });
+
+it("USD appreciation / BRL depreciation selects USD liquidity, never BRL cash or regional equities", () => {
+  for (const tag of [
+    "usd-liquidity",
+    "usd-brl-appreciation",
+    "brl-depreciation",
+    "brazilian-real-depreciation",
+  ]) {
+    const result = getCandidateAssets(exposures(tag));
+    assert.deepEqual(result.assets.map((asset) => asset.id).sort(), ["ondo-sgov", "pyusd", "usdc"]);
+    assert.equal(result.missingPrimary, false);
+    assert.ok(result.limitations.some((text) => text.includes("not USD/BRL derivatives")));
+  }
+  // An unspecified direction must not become a long-USD position automatically.
+  assert.deepEqual(getCandidateAssets(exposures("usd-brl-exchange-rate")).assets, []);
+  assert.deepEqual(
+    getCandidateAssets(exposures("brl-liquidity")).assets.map((a) => a.id),
+    ["transfero-brz"],
+  );
+});

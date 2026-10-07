@@ -6,6 +6,7 @@ import type {
   AnswerInput,
   ThesisAnswer,
 } from "../ai/schemas";
+import type { ThesisLanguage } from "../ai/language";
 import { getCandidateAssets } from "../assets/catalog-utils";
 import type { ApprovalTransport, WalletSnapshot, WalletChoice } from "./wallet-types";
 import type { DemoAsset, DemoMessage, Exposure, SimulatedInvestment } from "./types";
@@ -38,11 +39,14 @@ export interface WalletProvider {
 }
 
 export interface AssetCatalogProvider {
-  getCandidates(exposures: Exposure[]): ReturnType<typeof getCandidateAssets>;
+  getCandidates(
+    exposures: Exposure[],
+    language?: ThesisLanguage,
+  ): ReturnType<typeof getCandidateAssets>;
 }
 export class VicTyAssetCatalogProvider implements AssetCatalogProvider {
-  getCandidates(exposures: Exposure[]) {
-    return getCandidateAssets(exposures);
+  getCandidates(exposures: Exposure[], language: ThesisLanguage = "en") {
+    return getCandidateAssets(exposures, undefined, language);
   }
 }
 export interface PriceProvider {

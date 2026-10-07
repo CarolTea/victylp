@@ -1,3 +1,4 @@
+import { thesisLanguage } from "./language";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -39,6 +40,11 @@ export class OpenAIProvider implements AIProvider {
     validate?: (value: z.infer<T>) => z.infer<T>,
     instructions = VICTY_THESIS_INSTRUCTIONS,
   ): Promise<z.infer<T>> {
+    const belief =
+      data && typeof data === "object" && "belief" in data && typeof data.belief === "string"
+        ? data.belief
+        : "";
+    const language = thesisLanguage(belief);
     const input = JSON.stringify(data);
     if (input.length > 36_000)
       throw new Error("This request is too large. Please shorten your thesis or question.");
@@ -50,7 +56,7 @@ export class OpenAIProvider implements AIProvider {
     try {
       const response = await this.client.responses.parse({
         model: this.model,
-        instructions: `${instructions}\nOperation: ${operation}. Prompt version: ${PROMPT_VERSION}.`,
+        instructions: `${instructions}\n${operation === "scope_check" ? "" : `Required output language: ${language === "pt" ? "Portuguese" : "English"}. This applies to every natural-language field; never copy a different language from catalog metadata or earlier responses.`}\nOperation: ${operation}. Prompt version: ${PROMPT_VERSION}.`,
         input,
         store: false,
         reasoning: { effort: "low" },

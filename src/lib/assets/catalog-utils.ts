@@ -1,3 +1,4 @@
+import type { ThesisLanguage } from "../ai/language";
 import { ASSET_CATALOG } from "./catalog";
 import type { CatalogAsset, InstrumentType } from "./types";
 import type { Exposure } from "../demo/types";
@@ -30,6 +31,12 @@ const aliases: Record<string, string> = {
   "brazil-commodity-exports": "commodity-exporters",
   "brazil-oil-exports": "brazil-energy",
   brl: "brl-liquidity",
+  "us-dollar-liquidity": "usd-liquidity",
+  "dollar-liquidity": "usd-liquidity",
+  "usd-appreciation": "usd-liquidity",
+  "usd-brl-appreciation": "usd-liquidity",
+  "brl-depreciation": "usd-liquidity",
+  "brazilian-real-depreciation": "usd-liquidity",
   "brazilian-interest-rates": "brazil-interest-rates",
   selic: "brazil-interest-rates",
   "brazilian-fixed-income": "brazil-local-fixed-income",
@@ -100,7 +107,12 @@ export function matchesExposure(asset: CatalogAsset, exposure: Pick<Exposure, "i
   const tags = exposureTags(exposure);
   return [...asset.exposures, ...asset.themes].some((tag) => tags.has(tag));
 }
-export function getCandidateAssets(exposures: Exposure[], types?: InstrumentType[]) {
+export function getCandidateAssets(
+  exposures: Exposure[],
+  types?: InstrumentType[],
+  language: ThesisLanguage = "en",
+) {
+  const localized = (en: string, pt: string) => (language === "pt" ? pt : en);
   const ids = exposures.map((e) => canonicalId(e.id));
   const ranked = ASSET_CATALOG.filter(
     (a) => a.enabled && (!types || types.includes(a.instrumentType)),
@@ -131,38 +143,69 @@ export function getCandidateAssets(exposures: Exposure[], types?: InstrumentType
   }
   const assets = [...chosen.values()];
   const missing = exposures.filter((e) => !assets.some((a) => matchesExposure(a, e)));
-  const limitations = missing.map(
-    (e) => `The catalog has no approved representation for ${e.name}.`,
+  const limitations = missing.map((e) =>
+    localized(
+      `The catalog has no approved representation for ${e.name}.`,
+      `O catálogo não possui uma representação aprovada para ${e.name}.`,
+    ),
   );
   for (const e of exposures) {
     if (regionalProxies[canonicalId(e.id)] && assets.some((a) => matchesExposure(a, e)))
       limitations.push(
-        `The catalog has no direct Brazilian representation for ${e.name}. The candidates are thematic infrastructure proxies, not dedicated Brazilian exposure.`,
+        localized(
+          `The catalog has no direct Brazilian representation for ${e.name}. The candidates are thematic infrastructure proxies, not dedicated Brazilian exposure.`,
+          `O catálogo não possui representação brasileira direta para ${e.name}. Os candidatos são aproximações temáticas de infraestrutura, não exposição dedicada ao Brasil.`,
+        ),
       );
   }
   if (ids.includes("brazil-domestic-consumption") && assets.some((a) => a.id === "backpack-ewz"))
     limitations.push(
-      "EWZ offers broad Brazilian large- and mid-cap equities, not a dedicated domestic-consumption or small-cap portfolio.",
+      localized(
+        "EWZ offers broad Brazilian large- and mid-cap equities, not a dedicated domestic-consumption or small-cap portfolio.",
+        "EWZ representa ações brasileiras de grande e médio porte, não uma carteira dedicada ao consumo doméstico ou a pequenas empresas.",
+      ),
     );
   if (assets.some((a) => a.id === "ondo-pbr"))
     limitations.push(
-      "PBRon represents Petrobras, a single oil-and-gas company, not broad Brazilian-market exposure or all commodity exporters.",
+      localized(
+        "PBRon represents Petrobras, a single oil-and-gas company, not broad Brazilian-market exposure or all commodity exporters.",
+        "PBRon representa a Petrobras, uma única empresa de petróleo e gás, não todo o mercado brasileiro ou todos os exportadores de commodities.",
+      ),
     );
   if (ids.includes("emerging-market-equities") || ids.includes("latam"))
     limitations.push(
-      "The catalog has limited regional coverage, not a diversified Latin America or emerging-markets portfolio.",
+      localized(
+        "The catalog has limited regional coverage, not a diversified Latin America or emerging-markets portfolio.",
+        "O catálogo possui cobertura regional limitada, não uma carteira diversificada de América Latina ou mercados emergentes.",
+      ),
     );
   if (assets.some((a) => a.id === "transfero-brz"))
     limitations.push(
-      "BRZ represents BRL liquidity, not Brazilian corporate growth or yield-bearing fixed income.",
+      localized(
+        "BRZ represents BRL liquidity, not Brazilian corporate growth or yield-bearing fixed income.",
+        "BRZ representa liquidez em reais, não crescimento de empresas brasileiras ou renda fixa com juros.",
+      ),
     );
   if (assets.some((a) => a.id === "etherfuse-tesouro" || a.id === "etherfuse-cetes"))
     limitations.push(
-      "TESOURO and CETES represent local sovereign fixed income, not equities. Their returns, maturity, liquidity and eligibility are not asserted by this demo.",
+      localized(
+        "TESOURO and CETES represent local sovereign fixed income, not equities. Their returns, maturity, liquidity and eligibility are not asserted by this demo.",
+        "TESOURO e CETES representam renda fixa soberana local, não ações. A demo não informa rentabilidade, vencimento, liquidez ou elegibilidade atuais.",
+      ),
+    );
+  if (ids.includes("usd-liquidity") && assets.some((a) => a.exposures.includes("usd-liquidity")))
+    limitations.push(
+      localized(
+        "USD stablecoins represent dollar-denominated liquidity, not USD/BRL derivatives or guaranteed hedges. Issuer and depeg risks remain; simulated performance in USD does not measure returns in BRL.",
+        "Stablecoins em USD representam liquidez em dólar, não derivativos USD/BRL ou proteção garantida. Há riscos de emissor e desancoragem; a performance simulada em USD não mede o retorno em reais.",
+      ),
     );
   if (assets.length < 8)
     limitations.push(
-      `Only ${assets.length} relevant catalog instruments were found; unrelated assets will not be added to fill the portfolio.`,
+      localized(
+        `Only ${assets.length} relevant catalog instruments were found; unrelated assets will not be added to fill the portfolio.`,
+        `Foram encontrados ${assets.length} instrumentos relevantes no catálogo; ativos sem relação com a tese não serão adicionados para completar a carteira.`,
+      ),
     );
   return { assets, limitations, missingPrimary: missing.some((e) => e.importance !== "secondary") };
 }

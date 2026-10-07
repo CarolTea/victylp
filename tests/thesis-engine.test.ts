@@ -362,3 +362,21 @@ it("complete engine fixtures produce distinct compute and electricity portfolios
   }
   assert.notDeepEqual(outputIds[0], outputIds[1]);
 });
+
+it("Portuguese beliefs explicitly set the output language despite English context", async () => {
+  const requests: Record<string, unknown>[] = [];
+  const provider = new OpenAIProvider(
+    fakeClient(
+      { summary: "A demanda por energia deve aumentar", exposures: [], limitations: [] },
+      requests,
+    ),
+  );
+  await provider.interpret("Acredito que a demanda por energia vai crescer", [
+    { id: "prior", role: "assistant", text: "Energy demand will grow" },
+  ]);
+  assert.match(String(requests[1]!.instructions), /Required output language: Portuguese/);
+  assert.match(
+    String(requests[1]!.instructions),
+    /clarify and interpret receive a taxonomy, NOT candidate assets/,
+  );
+});
