@@ -260,7 +260,7 @@ function Waitlist() {
 
 function BeliefToStrategy() {
   const steps = ["What do you believe?", "VicTy maps the exposures", "Finds assets that represent them", "Builds an editable strategy", "You decide what to invest in"];
-  return <section id="belief-to-strategy" className="flow-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">FROM BELIEF TO STRATEGY</p><h2 className="section-title">One idea.<br /><span className="gradient-text">A strategy you control.</span></h2></Reveal><ol className="flow-steps">{steps.map((step, index) => <Reveal as-child="false" className="flow-step" delay={index * 90} key={step}><span>0{index + 1}</span><p>{step}</p></Reveal>)}</ol></div></section>;
+  return <section id="belief-to-strategy" className="flow-section section-shell"><div className="page-width"><Reveal><p className="eyebrow">FROM BELIEF TO STRATEGY</p><h2 className="section-title">One idea.<br /><span className="gradient-text">A strategy you control.</span></h2></Reveal><ol className="flow-steps">{steps.map((step, index) => <li key={step}><Reveal className="flow-step" delay={index * 90}><span>0{index + 1}</span><p>{step}</p></Reveal></li>)}</ol></div></section>;
 }
 
 function StrategyNetwork() {
