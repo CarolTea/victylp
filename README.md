@@ -2,113 +2,113 @@
 
 > **Invest in what you believe.**
 >
-> Transforme ideias em estratégias. Entenda suas escolhas. Invista nos seus termos.
+> Turn ideas into strategies. Understand your choices. Invest on your terms.
 
-As pessoas têm opiniões sobre o futuro, mas transformar uma convicção em uma decisão de investimento exige conhecimento sobre ativos, riscos e mercados. **A VicTy constrói essa ponte:** parte de uma ideia, identifica as exposições econômicas envolvidas e apresenta uma composição que a pessoa consegue compreender e ajustar.
+People have beliefs about the future, but turning a conviction into an investment decision requires knowledge of assets, risks, and markets. **VicTy bridges that gap:** it starts with an idea, identifies the economic exposures behind it, and proposes a portfolio people can understand and adjust.
 
-Nossa visão é tornar essas estratégias também compartilháveis: descobrir ideias de outros criadores, entender seus fundamentos, adaptá-las e decidir como participar. Pelo aplicativo da VicTy ou, futuramente, dentro de wallets e plataformas parceiras.
+Our vision also makes these strategies shareable: discover ideas from other creators, understand their rationale, adapt them, and decide how to participate. Through the VicTy app or, eventually, within partner wallets and platforms.
 
 **Built by women. Built for independent decisions.**
 
-[Conheça a VicTy](https://victy.finance) · [Experimente a demo](https://victy.finance/demo) · [Roadmap](#roadmap) · [Desenvolvimento local](#desenvolvimento-local)
+[Explore VicTy](https://victy.finance) · [Try the demo](https://victy.finance/demo) · [Roadmap](#roadmap) · [Local development](#local-development)
 
-## Da convicção à composição
+## From belief to portfolio
 
-> “Acredito que a inteligência artificial vai aumentar a demanda por energia.”
+> “I believe artificial intelligence will increase demand for energy.”
 
-A VicTy ajuda a explorar o que essa ideia significa economicamente, quais instrumentos do catálogo podem representá-la e onde essa representação é limitada. Cada ativo vem acompanhado de uma explicação sobre seu papel e seus riscos.
+VicTy helps explore what that idea means economically, which instruments in the catalog can represent it, and where that representation falls short. Each asset comes with an explanation of its role and risks.
 
-1. **Expresse uma convicção.** Escreva sua ideia e responda às perguntas de esclarecimento quando necessário.
-2. **Entenda a interpretação.** Revise as exposições econômicas identificadas e suas limitações.
-3. **Explore a composição.** Examine os ativos propostos, ajuste os pesos e faça perguntas à VicTy.
-4. **Aprove uma simulação.** Conecte uma wallet compatível e assine uma mensagem de aprovação.
-5. **Salve sua tese.** Entre por e-mail para acessar suas teses em um dashboard privado, com acompanhamento ilustrativo.
+1. **Express a belief.** Describe your idea and answer clarifying questions when needed.
+2. **Review the interpretation.** Examine the identified economic exposures and their limitations.
+3. **Explore the portfolio.** Review proposed assets, adjust allocations, and ask VicTy questions.
+4. **Approve a simulation.** Connect a compatible wallet and sign an approval message.
+5. **Save your thesis.** Sign in by email to access your theses in a private dashboard with illustrative tracking.
 
-A unidade da experiência é a tese: o usuário deve compreender por que cada instrumento está ali antes de decidir sobre ele.
+The thesis is the foundation of the experience: users should understand why each instrument belongs before making a decision about it.
 
-## Três pilares
+## Three pillars
 
-| Pilar | Proposta | Estágio neste repositório |
+| Pillar | Purpose | Status in this repository |
 | --- | --- | --- |
-| **Thesis Engine** | Traduzir convicções em composições compreensíveis, com fundamentos e limitações. | Implementado na demo, com integração de IA e catálogo curado para simulação. |
-| **SocialFi** | Descobrir, compartilhar e adaptar estratégias de criadores e comunidades. | Interface demonstrativa, exemplos e publicação em memória durante a sessão. Rede persistente e remuneração estão no roadmap. |
-| **API-first** | Levar a inteligência da VicTy a wallets, aplicativos, fintechs e agentes. | Direção de arquitetura e distribuição. Ainda não há uma API pública para parceiros neste repositório. |
+| **Thesis Engine** | Translate beliefs into understandable portfolios, with rationale and limitations. | Implemented in the demo, with an AI integration and a curated catalog for simulation. |
+| **SocialFi** | Discover, share, and adapt strategies from creators and communities. | Demonstration interface, examples, and in-memory publishing for the current session. A persistent network and creator compensation are on the roadmap. |
+| **API-first** | Bring VicTy intelligence to wallets, apps, fintechs, and agents. | An architectural and distribution direction. This repository does not yet provide a public partner API. |
 
-## O que funciona hoje
+## What works today
 
-Este repositório contém o **MVP demonstrativo da VicTy**, desenvolvido para hackathon. Ele reúne a aplicação web e suas funções de servidor.
+This repository contains the **VicTy demonstration MVP**, built for a hackathon. It includes the web application and its server functions.
 
-| Recurso | Implementação atual |
+| Feature | Current implementation |
 | --- | --- |
-| Landing page e early access | Apresentação do produto e cadastro com persistência. |
-| Conversa com IA | Integração com OpenAI para esclarecimento, interpretação, composição e explicações, mediante configuração do servidor. |
-| Catálogo de instrumentos | Seleção curada e validação dos ativos propostos. Preços de referência são dados fixos de demonstração. |
-| Sessões da demo | Persistência de sessões anônimas com credenciais próprias. |
-| Wallet Solana | Descoberta, conexão e assinatura real de mensagem, com verificação criptográfica no servidor. |
-| Conta e teses privadas | Login por e-mail, salvamento de teses e consultas restritas ao proprietário. |
-| Dashboard | Composição salva e desempenho simulado determinístico. |
-| Estratégias públicas | Exemplos demonstrativos e publicação temporária na sessão aberta. |
+| Landing page and early access | Product presentation and persistent registration. |
+| AI conversation | OpenAI integration for clarification, interpretation, portfolio proposals, and explanations, subject to server configuration. |
+| Instrument catalog | Curated selection and validation of proposed assets. Reference prices are fixed demonstration data. |
+| Demo sessions | Persistent anonymous sessions with their own credentials. |
+| Solana wallet | Discovery, connection, and real message signing, with server-side cryptographic verification. |
+| Accounts and private theses | Email login, thesis saving, and owner-scoped queries. |
+| Dashboard | Saved portfolios and deterministic simulated performance. |
+| Public strategies | Demonstration examples and temporary publishing within the open session. |
 
-**A demo não executa investimentos reais.** A assinatura da wallet acontece fora da blockchain: não envia transações, não realiza swaps e não movimenta recursos. A indicação `solana:devnet` define o contexto da aprovação; não é prova de execução on-chain. Não é necessário saldo de SOL para assinar essa mensagem.
+**The demo does not execute real investments.** Wallet signing happens off-chain: it does not submit transactions, perform swaps, or move funds. The `solana:devnet` label defines the approval context; it is not evidence of on-chain execution. No SOL balance is required to sign this message.
 
-As rotas identificadas como **Jupiter demo**, os preços e o desempenho são simulados. A presença de um instrumento no catálogo não comprova disponibilidade de negociação na Solana, liquidez ou elegibilidade do usuário. Esses pontos precisam ser verificados antes da integração de execução real.
+Routes labeled **Jupiter demo**, prices, and performance are simulated. An instrument's inclusion in the catalog does not establish trading availability on Solana, liquidity, or user eligibility. These must be verified before integrating real execution.
 
-## Princípios do produto
+## Product principles
 
-- **Entender antes de investir.** Explicar a relação entre tese, instrumento e risco em linguagem acessível.
-- **Decisão do usuário.** Alterações propostas pela IA dependem de revisão e aplicação explícita. A execução futura será autorizada individualmente pela wallet.
-- **Controle dos ativos.** A arquitetura proposta é não custodial; o aplicativo não solicita chaves privadas.
-- **Catálogo delimitado.** A IA trabalha com candidatos curados, e o servidor valida os ativos e as alocações retornadas.
-- **Limitações visíveis.** Uma tese sem cobertura suficiente deve receber uma explicação, sem preencher a composição com ativos sem relação com a ideia.
-- **Resultados identificados.** Simulações e dados ilustrativos não representam rentabilidade observada.
+- **Understand before investing.** Explain the relationship between a thesis, an instrument, and its risks in accessible language.
+- **User decisions.** AI-proposed changes require explicit review and application. Future execution will require individual wallet authorization.
+- **Asset control.** The proposed architecture is non-custodial; the application does not request private keys.
+- **A bounded catalog.** AI works with curated candidates, and the server validates returned assets and allocations.
+- **Visible limitations.** A thesis with insufficient coverage should receive an explanation, without filling the portfolio with unrelated assets.
+- **Clearly identified results.** Simulations and illustrative data do not represent observed returns.
 
-## Arquitetura
+## Architecture
 
 ```text
-Aplicação React / TanStack Start
-  ├── Landing page e descoberta de estratégias
-  ├── Demo: convicção → interpretação → composição
-  ├── Wallet: conexão e assinatura de mensagem no navegador
-  └── Dashboard privado
+React / TanStack Start application
+  ├── Landing page and strategy discovery
+  ├── Demo: belief → interpretation → portfolio
+  ├── Wallet: connection and message signing in the browser
+  └── Private dashboard
           │
           ▼
-Funções de servidor TanStack
-  ├── Thesis Engine → provedor OpenAI + validação do catálogo
-  ├── Sessões, desafios e verificação de aprovação
-  └── Autenticação e persistência → Supabase / PostgreSQL
+TanStack server functions
+  ├── Thesis Engine → OpenAI provider + catalog validation
+  ├── Sessions, challenges, and approval verification
+  └── Authentication and persistence → Supabase / PostgreSQL
 ```
 
-As interfaces de provedores separam IA, wallet, catálogo, preços e execução da interface visual. Isso permite evoluir as integrações preservando a experiência do usuário.
+Provider interfaces separate AI, wallet, catalog, pricing, and execution services from the visual interface. This allows integrations to evolve while preserving the user experience.
 
-| Camada | Tecnologia |
+| Layer | Technology |
 | --- | --- |
-| Interface | React 19, TypeScript, Tailwind CSS 4, Radix UI e Motion |
-| Aplicação e rotas | TanStack Start, TanStack Router e React Query |
-| Build | Vite e configuração integrada ao Lovable |
-| IA | SDK OpenAI, saídas estruturadas e validação com Zod |
-| Dados e autenticação | Supabase, PostgreSQL e políticas de acesso por proprietário |
-| Migrações | SQL versionado em `drizzle/migrations/` |
-| Wallet Solana | `@solana/kit` e `@solana/kit-plugin-wallet` |
-| Testes | Bun, testes TypeScript e validação de persistência em PostgreSQL isolado |
+| Interface | React 19, TypeScript, Tailwind CSS 4, Radix UI, and Motion |
+| Application and routing | TanStack Start, TanStack Router, and React Query |
+| Build | Vite and Lovable-integrated configuration |
+| AI | OpenAI SDK, structured outputs, and Zod validation |
+| Data and authentication | Supabase, PostgreSQL, and owner-scoped access policies |
+| Migrations | Versioned SQL in `drizzle/migrations/` |
+| Solana wallet | `@solana/kit` and `@solana/kit-plugin-wallet` |
+| Tests | Bun, TypeScript tests, and persistence validation in isolated PostgreSQL |
 
-### Solana no MVP
+### Solana in the MVP
 
-O cliente usa `createClient().use(walletSigner(...))` para descobrir e conectar wallets compatíveis com `solana:signMessage`. O servidor emite um desafio com nonce, prazo de validade e vínculo à sessão, origem, wallet e operação simulada. A assinatura Ed25519 é verificada antes do consumo único do desafio.
+The client uses `createClient().use(walletSigner(...))` to discover and connect wallets supporting `solana:signMessage`. The server issues a challenge with a nonce, expiration, and bindings to the session, origin, wallet, and simulated operation. The Ed25519 signature is verified before the challenge is consumed exactly once.
 
-Essa aprovação é independente do login por e-mail utilizado para salvar e consultar teses. Não há programa on-chain próprio nem integração de swap em produção neste repositório.
+This approval is independent of the email login used to save and retrieve theses. This repository has no custom on-chain program or production swap integration.
 
-Detalhes: [aprovação por wallet](docs/solana-demo-wallet.md) e [Thesis Engine](docs/thesis-engine.md).
+Details: [wallet approval](docs/solana-demo-wallet.md) and [Thesis Engine](docs/thesis-engine.md).
 
-## Desenvolvimento local
+## Local development
 
-### Pré-requisitos
+### Prerequisites
 
-- Bun instalado; o repositório versiona `bun.lock` e configura a instalação em `bunfig.toml`.
-- Acesso a um projeto Supabase/Lovable Cloud com o esquema e a autenticação configurados.
-- Chave OpenAI para utilizar a IA real, ou configuração explícita de mock para desenvolvimento.
-- Wallet compatível com assinatura de mensagens e contexto Solana Devnet para testar a aprovação.
+- Bun installed; the repository tracks `bun.lock` and configures installation in `bunfig.toml`.
+- Access to a Supabase/Lovable Cloud project with its schema and authentication configured.
+- An OpenAI key for real AI responses, or explicit mock configuration for development.
+- A wallet supporting message signing and the Solana Devnet context to test approval.
 
-### Instalação
+### Installation
 
 ```sh
 git clone https://github.com/CarolTea/victylp.git
@@ -116,37 +116,37 @@ cd victylp
 bun install --frozen-lockfile
 ```
 
-Crie `.env.local`, ignorado pelo Git, com os valores do seu ambiente:
+Create `.env.local`, which is ignored by Git, with your environment values:
 
 ```dotenv
-# Configuração pública utilizada pelo navegador
-VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=SUA_CHAVE_PUBLICAVEL
+# Public configuration used by the browser
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
 
-# Configuração do servidor
-SUPABASE_URL=https://SEU-PROJETO.supabase.co
-SUPABASE_PUBLISHABLE_KEY=SUA_CHAVE_PUBLICAVEL
-SUPABASE_SERVICE_ROLE_KEY=SUA_CHAVE_DE_SERVIDOR
+# Server configuration
+SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_KEY
 
-# IA: consulte também .env.ai.example
+# AI: also see .env.ai.example
 AI_PROVIDER=openai
-OPENAI_API_KEY=SUA_CHAVE_OPENAI
-# Opcional: OPENAI_MODEL pode substituir o modelo padrão do código.
+OPENAI_API_KEY=YOUR_OPENAI_KEY
+# Optional: OPENAI_MODEL can override the default model in the code.
 ```
 
-Mantenha `SUPABASE_SERVICE_ROLE_KEY` e `OPENAI_API_KEY` exclusivamente no servidor, sem prefixo `VITE_`. Configure os endereços de retorno do login por e-mail para a origem local e a origem publicada.
+Keep `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` exclusively on the server, without a `VITE_` prefix. Configure email login redirect URLs for both the local and deployed origins.
 
-O banco precisa conter as migrações de [`drizzle/migrations/`](drizzle/migrations/). A instalação de dependências não provisiona o banco. Confira o histórico aplicado e utilize o fluxo de migrações existente no Lovable/Drizzle; não reaplique migrações nem use `supabase db push` como substituto desse histórico.
+The database must include the migrations from [`drizzle/migrations/`](drizzle/migrations/). Installing dependencies does not provision the database. Check the applied migration history and use the existing Lovable/Drizzle migration workflow; do not reapply migrations or use `supabase db push` as a substitute for that history.
 
 ```sh
 bun run dev
 ```
 
-Abra o endereço informado pelo Vite. As rotas principais são `/`, `/demo`, `/auth` e `/dashboard`.
+Open the address reported by Vite. The main routes are `/`, `/demo`, `/auth`, and `/dashboard`.
 
-Para desenvolver com respostas de IA locais, use `AI_PROVIDER=mock` com `NODE_ENV=development`. Esse modo não substitui o banco nem os demais serviços. Falhas da integração real não ativam respostas mock automaticamente.
+For local mock AI responses, use `AI_PROVIDER=mock` with `NODE_ENV=development`. This mode does not replace the database or other services. Failures in the real integration do not automatically activate mock responses.
 
-### Verificação
+### Verification
 
 ```sh
 bun test tests/
@@ -155,90 +155,90 @@ bun run lint
 bun run build
 ```
 
-Os testes automatizados não substituem a validação do login por e-mail, da extensão de wallet e do banco configurado. Consulte o [roteiro de persistência](docs/thesis-persistence-validation.md) para testes com contas distintas e banco descartável. Esse documento também registra resultados e limitações de verificações anteriores; eles não garantem o estado do deploy atual.
+Automated tests do not replace validation of email login, the wallet extension, and the configured database. See the [persistence checklist](docs/thesis-persistence-validation.md) for tests using separate accounts and a disposable database. That document also records results and limitations of earlier checks; they do not guarantee the state of the current deployment.
 
-Os scripts `tests/evaluate-thesis.ts` e `tests/evaluate-scope.ts` são avaliações opcionais com chamadas pagas de IA, ativadas explicitamente com `--live` e credenciais. Não são necessários para explorar a interface.
+The `tests/evaluate-thesis.ts` and `tests/evaluate-scope.ts` scripts are optional evaluations that make paid AI calls, explicitly enabled with `--live` and credentials. They are not required to explore the interface.
 
-### Estrutura
+### Repository structure
 
 ```text
 src/
-├── routes/                # Landing, demo, autenticação e dashboard
-├── components/            # Interface e componentes reutilizáveis
+├── routes/                # Landing, demo, authentication, and dashboard
+├── components/            # Interface and reusable components
 ├── lib/
-│   ├── ai/                # Engine, prompts, schemas e provedor de IA
-│   ├── assets/            # Catálogo curado e seleção de candidatos
-│   ├── demo/              # Sessões, provedores e aprovação da simulação
-│   ├── strategies/        # Exemplos e publicação social em memória
-│   ├── thesis/            # Tipos, consultas e desempenho ilustrativo
-│   └── wallet/            # Integração Solana no navegador
-└── integrations/supabase/ # Clientes, autenticação e tipos do banco
-drizzle/migrations/        # Histórico SQL
-tests/                     # Testes e avaliações opcionais
-docs/                      # Decisões técnicas e roteiros de validação
+│   ├── ai/                # Engine, prompts, schemas, and AI provider
+│   ├── assets/            # Curated catalog and candidate selection
+│   ├── demo/              # Sessions, providers, and simulation approval
+│   ├── strategies/        # Examples and in-memory social publishing
+│   ├── thesis/            # Types, queries, and illustrative performance
+│   └── wallet/            # Browser-side Solana integration
+└── integrations/supabase/ # Clients, authentication, and database types
+drizzle/migrations/        # SQL history
+tests/                     # Tests and optional evaluations
+docs/                      # Technical decisions and validation checklists
 ```
 
 ## Roadmap
 
-As fases abaixo indicam prioridades de evolução, sem compromisso de datas. Os itens concluídos descrevem implementações presentes no código; a disponibilidade depende da configuração e validação do ambiente.
+The phases below describe development priorities without committed dates. Completed items refer to implementations present in the code; availability depends on environment configuration and validation.
 
-### 1. Experiência demonstrativa — base implementada
+### 1. Demonstration experience — foundation implemented
 
-- [x] Identidade visual, landing page e cadastro de early access.
-- [x] Jornada interativa de convicção, esclarecimento e composição.
-- [x] Thesis Engine com integração de IA, catálogo curado e validação das respostas.
-- [x] Persistência de sessões anônimas.
-- [x] Conexão de wallet e aprovação criptográfica de simulações.
-- [x] Login por e-mail, teses privadas e dashboard com desempenho ilustrativo.
-- [x] Interface demonstrativa de descoberta e publicação de estratégias na sessão.
-- [ ] Consolidar a validação ponta a ponta do ambiente publicado e o roteiro de apresentação.
+- [x] Visual identity, landing page, and early-access registration.
+- [x] Interactive belief, clarification, and portfolio journey.
+- [x] Thesis Engine with AI integration, curated catalog, and response validation.
+- [x] Anonymous session persistence.
+- [x] Wallet connection and cryptographic approval of simulations.
+- [x] Email login, private theses, and a dashboard with illustrative performance.
+- [x] Demonstration interface for strategy discovery and publishing within the session.
+- [ ] Complete end-to-end validation of the deployed environment and the presentation walkthrough.
 
-### 2. Execução e acompanhamento reais
+### 2. Real execution and tracking
 
-- [ ] Verificar mints, disponibilidade, elegibilidade e liquidez dos instrumentos executáveis.
-- [ ] Integrar preços e cotações reais, com validade e custos explícitos.
-- [ ] Integrar Jupiter para compras e vendas individuais autorizadas pela wallet.
-- [ ] Tratar rejeição, expiração, falha e confirmação de transações sem duplicar operações.
-- [ ] Associar transações confirmadas às teses e reconciliar quantidades executadas.
-- [ ] Substituir o desempenho ilustrativo por acompanhamento baseado em dados verificáveis.
+- [ ] Verify mints, availability, eligibility, and liquidity for executable instruments.
+- [ ] Integrate live prices and quotes with explicit expiration and costs.
+- [ ] Integrate Jupiter for individual wallet-authorized purchases and sales.
+- [ ] Handle transaction rejection, expiration, failure, and confirmation without duplicate operations.
+- [ ] Associate confirmed transactions with theses and reconcile executed quantities.
+- [ ] Replace illustrative performance with tracking based on verifiable data.
 
-### 3. SocialFi — estratégias como conteúdo compartilhável
+### 3. SocialFi — strategies as shareable content
 
-- [ ] Persistir estratégias públicas, autoria e versões.
-- [ ] Permitir descobrir, acompanhar e adaptar estratégias de outros criadores.
-- [ ] Separar histórico de simulação e resultados de execução verificados.
-- [ ] Definir critérios transparentes para descoberta e rankings.
-- [ ] Validar atribuição de execuções, regras e remuneração de criadores.
+- [ ] Persist public strategies, authorship, and versions.
+- [ ] Enable discovery, following, and adaptation of other creators' strategies.
+- [ ] Separate simulation history from verified execution results.
+- [ ] Define transparent criteria for discovery and rankings.
+- [ ] Validate execution attribution, rules, and creator compensation.
 
-### 4. API-first — distribuição por parceiros
+### 4. API-first — partner distribution
 
-- [ ] Expor contratos versionados para interpretação e composição de teses.
-- [ ] Oferecer autenticação de parceiros, quotas, observabilidade e documentação.
-- [ ] Disponibilizar exemplos de integração com wallets, aplicativos e agentes.
-- [ ] Validar modelo comercial e pilotos com parceiros.
+- [ ] Expose versioned contracts for thesis interpretation and portfolio composition.
+- [ ] Provide partner authentication, quotas, observability, and documentation.
+- [ ] Offer integration examples for wallets, applications, and agents.
+- [ ] Validate the commercial model and partner pilots.
 
-O [roadmap original de implementação](roadmap.md) registra os marcos iniciais da interface e da persistência.
+The [original implementation roadmap](roadmap.md) records the initial interface and persistence milestones.
 
-## Modelo de negócio em validação
+## Business model under validation
 
-A visão comercial considera três fontes potenciais de receita:
+The commercial vision considers three potential revenue streams:
 
-1. **Execuções:** taxa transparente sobre volume efetivamente executado pelas integrações da VicTy.
-2. **Estratégias:** participação de criadores na receita de execuções atribuídas às suas estratégias.
-3. **API:** cobrança por uso, licenciamento ou participação na receita de integrações com parceiros.
+1. **Execution:** a transparent fee on volume actually executed through VicTy integrations.
+2. **Strategies:** a creator share of revenue from executions attributed to their strategies.
+3. **API:** usage fees, licensing, or revenue sharing for partner integrations.
 
-Preços, divisão de receitas e viabilidade econômica ainda estão em validação. A demo não implementa cobrança nem remuneração de criadores. A métrica proposta, **Thesis Volume**, representa o volume financeiro realmente executado a partir de teses; valores simulados não contam como esse volume.
+Pricing, revenue sharing, and economic viability are still being validated. The demo does not implement billing or creator compensation. The proposed metric, **Thesis Volume**, represents financial volume actually executed from theses; simulated amounts do not count toward it.
 
-## Documentação e colaboração
+## Documentation and contributing
 
-- [Thesis Engine e catálogo](docs/thesis-engine.md)
-- [Wallet Solana e aprovação da simulação](docs/solana-demo-wallet.md)
-- [Persistência, isolamento entre usuários e testes manuais](docs/thesis-persistence-validation.md)
-- [Diretrizes do repositório](AGENTS.md)
-- [Projeto no Lovable](https://lovable.dev/projects/1f73bb9a-bf1c-4531-8dd9-02e54c881eea)
+- [Thesis Engine and catalog](docs/thesis-engine.md)
+- [Solana wallet and simulation approval](docs/solana-demo-wallet.md)
+- [Persistence, user isolation, and manual tests](docs/thesis-persistence-validation.md)
+- [Repository guidelines](AGENTS.md)
+- [Lovable project](https://lovable.dev/projects/1f73bb9a-bf1c-4531-8dd9-02e54c881eea)
 
-Este repositório está conectado ao Lovable. Preserve o histórico publicado: não faça force push nem reescreva commits já enviados. Alterações na branch conectada sincronizam com o editor. Ao contribuir, mantenha integrações atrás das interfaces de provedores e preserve a autorização por proprietário no acesso às teses.
+This repository is connected to Lovable. Preserve published history: do not force push or rewrite commits that have already been pushed. Changes to the connected branch sync with the editor. When contributing, keep integrations behind provider interfaces and preserve owner-scoped authorization for thesis access.
 
 ---
 
-A VicTy está em desenvolvimento. Composições e simulações não constituem promessa de retorno. Instrumentos possuem riscos e condições próprias de acesso, que precisarão ser avaliados para a execução real.
+VicTy is under development. Portfolio proposals and simulations do not promise returns. Instruments have their own risks and access conditions, which must be assessed before real execution.
